@@ -29,4 +29,4 @@ pnpm build && node bin/phial.mjs dev examples/zero-config
 - `phial/vite-plugin`
 - `vuepagelet`
 
-The CLI entry also lives at `bin/phial.mjs`.
+The CLI ships as `phial` via the package `bin` field and also lives at `bin/phial.mjs`.

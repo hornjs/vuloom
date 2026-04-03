@@ -3,8 +3,6 @@ export {
   loadHornConfig as loadPhialConfig,
 } from "./lib/vite-plugin/config";
 export {
-  DEFAULT_CLIENT_BUILD_OUT_DIR,
-  DEFAULT_SERVER_BUILD_OUT_DIR,
   buildHornApp as buildPhialApp,
   prepareHornApp as preparePhialApp,
   startHornDevServer as startPhialDevServer,

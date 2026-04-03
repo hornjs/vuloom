@@ -13,12 +13,23 @@
   "bugs": {
     "url": "https://github.com/hornjs/phial/issues"
   },
+  "bin": {
+    "phial": "./bin/phial.mjs"
+  },
   "files": [
-    "dist"
+    "dist",
+    "bin/phial.mjs",
+    "src/lib/generated-routes.d.ts"
   ],
   "exports": {
-    ".": "./src/index.ts",
-    "./vite-plugin": "./src/vite-plugin.ts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./vite-plugin": {
+      "types": "./dist/vite-plugin.d.ts",
+      "default": "./dist/vite-plugin.js"
+    },
     "./generated-routes-manifest": "./src/lib/generated-routes.d.ts",
     "./generated-routes-modules": "./src/lib/generated-routes.d.ts",
     "./generated-app-runtime": "./src/lib/generated-routes.d.ts",
