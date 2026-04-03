@@ -28,8 +28,28 @@ describe("phial public entry surface", () => {
     expect(vitePluginSource).toContain("loadPhialConfig");
     expect(vitePluginSource).toContain("phialVitePlugin");
     expect(vitePluginSource).toContain("PhialConfig");
+    expect(vitePluginSource).not.toContain("\n  loadHornConfig,\n");
+    expect(vitePluginSource).not.toContain("\n  buildHornApp,\n");
+    expect(vitePluginSource).not.toContain("\n  prepareHornApp,\n");
+    expect(vitePluginSource).not.toContain("\n  startHornDevServer,\n");
+    expect(vitePluginSource).not.toContain("\n  startHornServer,\n");
+    expect(vitePluginSource).not.toContain("\n  hornVitePlugin,\n");
+    expect(vitePluginSource).not.toContain("\n  HornConfig,\n");
+    expect(vitePluginSource).not.toContain("\n  HornDevConfig,\n");
+    expect(vitePluginSource).not.toContain("\n  HornPluginOptions,\n");
+    expect(vitePluginSource).not.toContain("\n  HornServerConfig,\n");
+    expect(vitePluginSource).not.toContain("\n  LoadHornConfigOptions,\n");
+    expect(vitePluginSource).not.toContain("\n  LoadedHornConfig,\n");
+    expect(vitePluginSource).not.toContain("\n  HornBuildOptions,\n");
+    expect(vitePluginSource).not.toContain("\n  HornBuildResult,\n");
+    expect(vitePluginSource).not.toContain("\n  HornPrepareOptions,\n");
+    expect(vitePluginSource).not.toContain("\n  HornDevServerHandle,\n");
+    expect(vitePluginSource).not.toContain("\n  HornDevServerOptions,\n");
+    expect(vitePluginSource).not.toContain("\n  HornStartServerHandle,\n");
+    expect(vitePluginSource).not.toContain("\n  HornStartServerOptions,\n");
 
-    expect(cliSource).toContain('export { runPhialCli } from "./lib/cli/index";');
+    expect(cliSource).toContain("runPhialCli");
+    expect(cliSource).not.toContain('export { runHornCli } from "./lib/cli/index";');
     expect(binSource).toContain("runPhialCli");
 
     expect(readme).toContain("# phial");
