@@ -31,14 +31,49 @@ describe("phial public entry surface", () => {
     expect(packageJsonData.exports).toMatchObject({
       ".": {
         types: "./dist/index.d.ts",
-        default: "./dist/index.js",
+        browser: "./dist/index.js",
+        import: "./dist/index.js",
       },
       "./vite-plugin": {
         types: "./dist/vite-plugin.d.ts",
-        default: "./dist/vite-plugin.js",
+        import: "./dist/vite-plugin.js",
       },
-      "./generated-routes-manifest": "./src/lib/generated-routes.d.ts",
-      "./generated-config": "./src/lib/generated-routes.d.ts",
+      "./generated-routes-manifest": {
+        types: "./src/lib/generated-routes.d.ts",
+      },
+      "./generated-config": {
+        types: "./src/lib/generated-routes.d.ts",
+      },
+    });
+    expect(packageJsonData.exports["./generated-routes-manifest"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-routes-modules"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-app-runtime"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-app-loader"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-app-middleware"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-app-plugin"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-server-routes"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-server-middleware"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-server-plugin"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
+    });
+    expect(packageJsonData.exports["./generated-config"]).toEqual({
+      types: "./src/lib/generated-routes.d.ts",
     });
 
     await execFileAsync("pnpm", ["build"], { cwd: repoRoot });
