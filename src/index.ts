@@ -1,1 +1,1 @@
-export * from "vuepagelet";
+export { name, version } from "../package.json" with { type: "json" };

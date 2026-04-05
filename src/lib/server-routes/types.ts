@@ -1,5 +1,6 @@
 import type { RouteTree } from "fs-route-ir";
 import type { ModuleResolver } from "../app-routes/types";
+import type { ServerHandler, ServerMethodHandlers, ServerMiddleware } from "sevok";
 
 export type ServerRouteEntryKind = "route" | "directory-middleware";
 
@@ -15,23 +16,16 @@ export interface ScannedServerRuntimeInput {
   middleware?: Record<string, string>;
 }
 
-export type ServerRouteHandler = (request: Request) => unknown | Promise<unknown>;
-export type ServerMiddleware = (
-  request: Request,
-  next: (request: Request) => Promise<Response>,
-) => Response | Promise<Response>;
+// ServerRouteHandler now aligns with sevok's ServerHandler for full feature support
+export type ServerRouteHandler = ServerHandler;
+export type { ServerMiddleware, ServerMethodHandlers };
 
-export interface ServerRouteDefinition {
+// Extend sevok's ServerMethodHandlers to add phial-specific fields
+export interface ServerRouteDefinition extends ServerMethodHandlers {
   middlewareNames?: readonly string[];
   meta?: Record<string, unknown>;
-  handler?: ServerRouteHandler;
-  GET?: ServerRouteHandler;
-  POST?: ServerRouteHandler;
-  PUT?: ServerRouteHandler;
-  PATCH?: ServerRouteHandler;
-  DELETE?: ServerRouteHandler;
-  HEAD?: ServerRouteHandler;
-  OPTIONS?: ServerRouteHandler;
+  /** Fallback handler when no method-specific handler matches */
+  handler?: ServerHandler;
 }
 
 export interface ServerRouteRecord {

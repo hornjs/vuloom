@@ -1,5 +1,24 @@
 import type { RouteTree, SegmentToken } from "fs-route-ir";
+import type {
+  PageRouteRecord as VuePageletPageRouteRecord,
+  PageRouteModule as VuePageletPageRouteModule,
+  PageComponentRouteModule as VuePageletPageComponentRouteModule,
+  PageGroupRouteModule as VuePageletPageGroupRouteModule,
+  AppModule as VuePageletAppModule,
+  LoaderContext as VuePageletLoaderContext,
+  ActionContext as VuePageletActionContext,
+  MiddlewareContext as VuePageletMiddlewareContext,
+  PageMiddleware as VuePageletPageMiddleware,
+  LoaderResult,
+  ActionResult,
+  ShouldRevalidateArgs,
+  PageMiddleware,
+} from "vuepagelet/integration";
 
+/**
+ * App route entry kinds supported by phial's file-system routing.
+ * These map to vuepagelet's route module structure.
+ */
 export type AppRouteEntryKind =
   | "layout"
   | "page"
@@ -10,6 +29,9 @@ export type AppRouteEntryKind =
   | "middleware"
   | "directory-middleware";
 
+/**
+ * Input from the scanner for app routes.
+ */
 export interface ScannedAppRouteEntry {
   file: string;
 }
@@ -18,6 +40,9 @@ export interface ScannedAppRoutesInput {
   entries: ScannedAppRouteEntry[];
 }
 
+/**
+ * Input from the scanner for app-level runtime files.
+ */
 export interface ScannedAppRuntimeInput {
   app?: string;
   error?: string;
@@ -26,122 +51,125 @@ export interface ScannedAppRuntimeInput {
   middleware?: Record<string, string>;
 }
 
+/**
+ * Module resolver for loading route files.
+ */
 export interface ModuleResolver {
   resolve(file: string): unknown | Promise<unknown>;
 }
 
-export type ComponentLike = unknown;
+/**
+ * Component-like type for route components.
+ * Vue components are the primary use case.
+ */
+export type ComponentLike = NonNullable<VuePageletAppModule["shell"]>;
 
-export interface LoaderContext {
-  request: Request;
-  params: Record<string, string>;
-  query: URLSearchParams;
-  route: PageRouteRecord;
-  matches: PageRouteRecord[];
-}
+// Re-export core types from vuepagelet for seamless integration
+export type {
+  VuePageletLoaderContext as LoaderContext,
+  VuePageletActionContext as ActionContext,
+  VuePageletMiddlewareContext as MiddlewareContext,
+  VuePageletPageMiddleware as PageMiddleware,
+  LoaderResult,
+  ActionResult,
+  ShouldRevalidateArgs,
+};
 
-export interface ActionContext extends LoaderContext {
-  formData: FormData;
-}
+/**
+ * Navigation-specific shouldRevalidate args.
+ */
+export type NavigationShouldRevalidateArgs = Extract<ShouldRevalidateArgs, { type: "navigation" }>;
 
-export interface MiddlewareContext extends LoaderContext {
-  phase: "render" | "action";
-}
+/**
+ * Action-specific shouldRevalidate args.
+ */
+export type ActionShouldRevalidateArgs = Extract<ShouldRevalidateArgs, { type: "action" }>;
 
-export type LoaderFunction = (context: LoaderContext) => unknown | Promise<unknown>;
-export type ActionFunction = (context: ActionContext) => unknown | Promise<unknown>;
-export type PageMiddleware = (
-  context: MiddlewareContext,
-  next: () => Promise<Response | void>,
-) => Response | void | Promise<Response | void>;
+/**
+ * App module configuration - aligned with vuepagelet's AppModule.
+ * Provides shell layout, global error boundary, app-level loader, and shouldRevalidate.
+ */
+export interface AppModule extends VuePageletAppModule {}
 
-export interface BaseShouldRevalidateArgs {
-  currentUrl: URL | null;
-  nextUrl: URL;
-  currentParams: Record<string, string>;
-  nextParams: Record<string, string>;
-  defaultShouldRevalidate: boolean;
-}
+/**
+ * Base route module properties shared between layout and page routes.
+ * Maps directly to vuepagelet's BasePageRouteModule.
+ */
+export type BasePageRouteModule = Omit<VuePageletPageRouteModule, "action">;
 
-export interface NavigationShouldRevalidateArgs extends BaseShouldRevalidateArgs {
-  type: "navigation";
-}
+/**
+ * Route module for page components with optional action handler.
+ * Maps directly to vuepagelet's PageComponentRouteModule.
+ */
+export interface PageComponentRouteModule extends VuePageletPageComponentRouteModule {}
 
-export interface ActionShouldRevalidateArgs extends BaseShouldRevalidateArgs {
-  type: "action";
-  formMethod: string;
-  formAction: string;
-  actionStatus: number;
-  actionRouteId: string;
-  actionResult?: unknown;
-}
+/**
+ * Route module for layout-only routes (groups).
+ * Maps directly to vuepagelet's PageGroupRouteModule.
+ */
+export interface PageGroupRouteModule extends VuePageletPageGroupRouteModule {}
 
-export interface AppModule {
-  shell?: ComponentLike;
-  loader?: (request: Request) => unknown | Promise<unknown>;
-  error?: ComponentLike;
-  shouldRevalidate?: (args: NavigationShouldRevalidateArgs | ActionShouldRevalidateArgs) => boolean;
-}
+/**
+ * Route module union type.
+ */
+export type PageRouteModule = VuePageletPageRouteModule;
 
-export interface BasePageRouteModule {
-  layout?: ComponentLike;
-  loading?: ComponentLike;
-  error?: ComponentLike;
-  component?: ComponentLike;
-  loader?: LoaderFunction;
-  middleware?: PageMiddleware[];
-  shouldRevalidate?: (args: NavigationShouldRevalidateArgs | ActionShouldRevalidateArgs) => boolean;
-}
+/**
+ * Route record representing a page or layout route.
+ * Maps directly to vuepagelet's PageRouteRecord.
+ */
+export type PageRouteRecord = VuePageletPageRouteRecord;
 
-export interface PageComponentRouteModule extends BasePageRouteModule {
-  component?: ComponentLike;
-  action?: ActionFunction;
-}
-
-export interface PageGroupRouteModule extends BasePageRouteModule {
-  component?: never;
-  action?: never;
-}
-
-export type PageRouteModule = PageComponentRouteModule | PageGroupRouteModule;
-
-export interface PageRouteRecord {
-  id: string;
-  path?: string;
-  name?: string;
-  module: PageRouteModule;
-  children: PageRouteRecord[];
-}
-
+/**
+ * Middleware reference - can be a registered name or direct function.
+ */
 export type MiddlewareReference = string | PageMiddleware;
 
+/**
+ * Options for creating route runtime modules.
+ */
 export interface CreateRouteRuntimeModulesOptions {
   app?: ScannedAppRuntimeInput;
   routes?: ScannedAppRoutesInput;
   resolveModule: ModuleResolver["resolve"];
 }
 
+/**
+ * Result of creating route runtime modules.
+ */
 export interface CreateRouteRuntimeModulesResult {
   app?: AppModule;
   routes: PageRouteRecord[];
   tree: RouteTree<unknown, AppRouteEntryKind>;
 }
 
+/**
+ * Resolved app runtime with middleware registry.
+ */
 export interface ResolvedAppRuntime {
   app?: AppModule;
   middlewareRegistry: Record<string, PageMiddleware>;
 }
 
+/**
+ * Internal layout anchor tracking for route tree building.
+ */
 export interface LayoutAnchor {
   id: string;
   segments: string[];
   middlewareDepth: number;
 }
 
+/**
+ * Internal pending route record before nesting.
+ */
 export interface PendingRouteRecord extends Omit<PageRouteRecord, "children"> {
   parentId?: string;
   index?: boolean;
   children: PageRouteRecord[];
 }
 
+/**
+ * Route segment token alias.
+ */
 export type RouteSegmentToken = SegmentToken;
