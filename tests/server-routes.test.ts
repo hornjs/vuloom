@@ -21,13 +21,13 @@ function createModuleResolver(modules: Record<string, unknown>): ModuleResolver 
 describe("createServerRouteModules", () => {
   test("builds server route records and middleware registry from scanned inputs", async () => {
     const globalMiddleware = async (
-      request: Request,
-      next: (request: Request) => Promise<Response>,
-    ) => next(request);
+      context: { request: Request },
+      next: (context: { request: Request }) => Promise<Response>,
+    ) => next(context);
     const scopeMiddleware = async (
-      request: Request,
-      next: (request: Request) => Promise<Response>,
-    ) => next(request);
+      context: { request: Request },
+      next: (context: { request: Request }) => Promise<Response>,
+    ) => next(context);
     const getHandler = async () => ({ ok: true });
     const postHandler = async () => ({ created: true });
     const robotsHandler = () => new Response("ok");

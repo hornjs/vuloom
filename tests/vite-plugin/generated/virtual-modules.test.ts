@@ -107,15 +107,31 @@ describe("virtual module generators", () => {
     expect(appPluginModule).not.toContain('from "@hornjs/horn"');
     expect(appPluginModule).toContain("export function createAppPlugin");
     expect(appPluginModule).toContain("createIntegration");
+    expect(appPluginModule).toContain("return async (context, next) => {");
+    expect(appPluginModule).toContain("const request = context.request");
+    expect(appPluginModule).toContain("return next(context)");
     expect(appPluginModule).toContain("export default createAppPlugin");
     expect(appPluginModule).not.toContain("createIntegration: () => integration");
-    expect(serverPluginModule).toContain("createServerRoutesPlugin");
+    expect(serverPluginModule).toContain("createServerPlugin");
     expect(serverPluginModule).not.toContain("@hornjs/horn/internal/vite-plugin");
     expect(serverPluginModule).not.toContain('from "@hornjs/horn"');
     expect(serverPluginModule).toContain("export function createServerPlugin");
+    expect(serverPluginModule).toContain("return async (context, next) => {");
+    expect(serverPluginModule).toContain("const request = context.request");
+    expect(serverPluginModule).toContain("return next(context)");
     expect(serverPluginModule).toContain("export default createServerPlugin");
     expect(serverPluginModule).toContain("serverRoutes");
+    expect(serverPluginModule).toContain("runMiddleware");
+    expect(serverPluginModule).toContain("return handleRoute(context, handler)");
+    expect(serverPluginModule).toContain("return runMiddleware({");
+    expect(serverPluginModule).toContain("context,");
+    expect(serverPluginModule).toContain("middleware,");
+    expect(serverPluginModule).toContain("terminal: (nextContext) => handleRoute(nextContext, handler),");
     expect(serverPluginModule).toContain("globalMiddlewareNames: config.server?.middleware ?? []");
+    expect(serverPluginModule).not.toContain(
+      "runMiddleware(middleware, request, (nextRequest) => handleRoute(nextRequest, handler))",
+    );
+    expect(serverPluginModule).not.toContain("const result = await handler(request)");
     expect(routesModule).toContain("export const routeFiles = {");
     expect(routesModule).toContain("createPhialRouteModule");
     expect(routesModule).toContain(
@@ -131,7 +147,7 @@ describe("virtual module generators", () => {
     expect(clientEntry).toContain("[phial]");
   });
 
-  test("generates server routes in the shape expected by fest server plugin", () => {
+  test("generates server routes in the shape expected by the sevok server plugin", () => {
     const serverRoutesModule = createVirtualServerRoutesModule(scannedResult);
 
     expect(serverRoutesModule).toContain("directoryMiddlewareNames");

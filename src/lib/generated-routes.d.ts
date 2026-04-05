@@ -7,7 +7,7 @@ declare namespace PhialGeneratedTypes {
   type CreateRouteRuntimeIntegrationOptions =
     import("vuepagelet/integration").CreateRouteRuntimeIntegrationOptions;
   type RouteRuntimeIntegration = import("vuepagelet/integration").RouteRuntimeIntegration;
-  type FestServerPlugin = unknown;
+  type SevokServerPlugin = import("sevok").ServerPlugin;
 
   interface DevConfig {
     host?: string;
@@ -53,23 +53,17 @@ declare namespace PhialGeneratedTypes {
     index?: boolean;
   }
 
-  type ServerRouteHandler = (request: Request) => unknown | Promise<unknown>;
-  type ServerMiddleware = (
-    request: Request,
-    next: (request: Request) => Promise<Response>,
-  ) => Response | Promise<Response>;
+  // ServerRouteHandler now aligns with sevok's ServerHandler for full feature support
+  type ServerRouteHandler = import("sevok").ServerHandler;
+  type ServerMiddleware = import("sevok").ServerMiddleware;
+  type ServerMethodHandlers = import("sevok").ServerMethodHandlers;
 
-  interface ServerRouteDefinition {
+  // Extend sevok's ServerMethodHandlers to add phial-specific fields
+  interface ServerRouteDefinition extends ServerMethodHandlers {
     middlewareNames?: readonly string[];
     meta?: Record<string, unknown>;
+    /** Fallback handler when no method-specific handler matches */
     handler?: ServerRouteHandler;
-    GET?: ServerRouteHandler;
-    POST?: ServerRouteHandler;
-    PUT?: ServerRouteHandler;
-    PATCH?: ServerRouteHandler;
-    DELETE?: ServerRouteHandler;
-    HEAD?: ServerRouteHandler;
-    OPTIONS?: ServerRouteHandler;
   }
 
   interface ServerRouteRecord {
@@ -147,8 +141,8 @@ declare module "phial/generated-app-plugin" {
 
   export function createAppPlugin(
     options?: PhialCreateAppPluginOptions,
-  ): PhialGeneratedTypes.FestServerPlugin;
-  export const appPlugin: PhialGeneratedTypes.FestServerPlugin;
+  ): PhialGeneratedTypes.SevokServerPlugin;
+  export const appPlugin: PhialGeneratedTypes.SevokServerPlugin;
   export default createAppPlugin;
 }
 
@@ -164,8 +158,8 @@ declare module "phial/generated-server-middleware" {
 }
 
 declare module "phial/generated-server-plugin" {
-  export function createServerPlugin(): PhialGeneratedTypes.FestServerPlugin;
-  export const serverPlugin: PhialGeneratedTypes.FestServerPlugin;
+  export function createServerPlugin(): PhialGeneratedTypes.SevokServerPlugin;
+  export const serverPlugin: PhialGeneratedTypes.SevokServerPlugin;
   export default createServerPlugin;
 }
 
