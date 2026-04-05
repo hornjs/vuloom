@@ -2,7 +2,7 @@
 
 This example shows the current smallest working `phial` app with file routes, no manual route registration, `phial.config.ts` as the only bootstrap declaration, `app/loader.ts` shell data, `app/app.config.ts` named middleware registration, directory-scoped `_middleware.ts`, route loading boundaries, a page `action`, and `server/routes` HTTP handlers with global and directory-scoped server middleware.
 
-`app/app.vue` is the full document shell (`html/head/body`), and the default client runtime hydrates that document shell automatically. `app/loader.ts` provides shell-level server data for `useAppData()`, while `app/app.config.ts` registers app-level middleware by name. `app/pages/layout.ts` handles the route layout, `loading.ts` files render during client navigation, the home page demonstrates a progressively enhanced `POST` form with `useSubmit()`, and server routes use `Request.context` via `@hornjs/fest` and `@hornjs/fest/utils`.
+`app/app.vue` is the full document shell (`html/head/body`), and the default client runtime hydrates that document shell automatically. `app/loader.ts` provides shell-level server data for `useAppData()`, while `app/app.config.ts` registers app-level middleware by name. `app/pages/layout.ts` handles the route layout, `loading.ts` files render during client navigation, the home page demonstrates a progressively enhanced `POST` form with `useSubmit()`, and server routes execute as `sevok` invocation contexts so handlers can call `ctx.request`, `ctx.get(...)`, or `ctx.waitUntil(...)`.
 
 ## Files
 
@@ -42,9 +42,9 @@ The example imports `phial` by package name, so building first ensures `dist/` i
 For a production asset build from the package root:
 
 ```bash
-node bin/phial.mjs prepare examples/zero-config
-node bin/phial.mjs build examples/zero-config
-node bin/phial.mjs start examples/zero-config
+pnpm exec tsx src/bin.ts prepare examples/zero-config
+pnpm exec tsx src/bin.ts build examples/zero-config
+pnpm exec tsx src/bin.ts start examples/zero-config
 ```
 
 `phial prepare` writes `.phial/types/middleware.d.ts` and `.phial/types/routes.d.ts`. Those power middleware-name autocomplete plus the generated app-route path/id/params types derived from `app/pages/`.

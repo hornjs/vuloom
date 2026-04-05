@@ -35,9 +35,9 @@ describe("zero-config example phial surface", () => {
     expect(readme).toContain("`phial` app");
     expect(readme).toContain("`phial.config.ts`");
     expect(readme).toContain("From `repos/phial`:");
-    expect(readme).toContain("node bin/phial.mjs prepare examples/zero-config");
-    expect(readme).toContain("node bin/phial.mjs build examples/zero-config");
-    expect(readme).toContain("node bin/phial.mjs start examples/zero-config");
+    expect(readme).toContain("pnpm exec tsx src/bin.ts prepare examples/zero-config");
+    expect(readme).toContain("pnpm exec tsx src/bin.ts build examples/zero-config");
+    expect(readme).toContain("pnpm exec tsx src/bin.ts start examples/zero-config");
     expect(readme).toContain("`phial prepare` writes `.phial/types/middleware.d.ts`");
     expect(readme).toContain("`.phial/types/routes.d.ts`");
     expect(readme).not.toContain("`horn` app");
@@ -46,6 +46,30 @@ describe("zero-config example phial surface", () => {
     expect(readme).not.toContain("@hornjs/horn");
     expect(readme).not.toContain("From `packages/phial`:");
     expect(readme).not.toContain("\nphial prepare\nphial build\nphial start\n");
+
+    const homePageSource = readExampleFile("app/pages/page.ts");
+    expect(homePageSource).not.toContain("this.data.value");
+    expect(homePageSource).not.toContain("this.layoutData.value");
+    expect(homePageSource).not.toContain("this.actionData.value");
+    expect(homePageSource).not.toContain("this.layoutActionData.value");
+
+    const blogPageSource = readExampleFile("app/pages/blog/[slug]/page.ts");
+    expect(blogPageSource).not.toContain("this.data.value");
+    expect(blogPageSource).not.toContain("this.route.value");
+
+    const blogLoadingSource = readExampleFile("app/pages/blog/[slug]/loading.ts");
+    expect(blogLoadingSource).toContain("route:");
+    expect(blogLoadingSource).not.toContain("routeId:");
+    expect(blogLoadingSource).not.toContain("location:");
+
+    const jsxPageSource = readExampleFile("app/pages/jsx/page.tsx");
+    expect(jsxPageSource).not.toContain("route.value.fullPath");
+
+    const rootLoadingSource = readExampleFile("app/pages/loading.ts");
+    expect(rootLoadingSource).toContain("route:");
+    expect(rootLoadingSource).not.toContain("routeId:");
+    expect(rootLoadingSource).not.toContain("location:");
+    expect(rootLoadingSource).not.toContain("previousLocation:");
 
     for (const relativePath of [
       "app/app.vue",
@@ -60,8 +84,15 @@ describe("zero-config example phial surface", () => {
       if (relativePath === "app/error.vue") {
         expect(source).toContain('data-phial-error=""');
         expect(source).not.toContain("data-horn-error");
+      } else if (
+        relativePath === "app/app.vue" ||
+        relativePath === "app/pages/jsx/page.tsx" ||
+        relativePath === "app/pages/sfc/page.vue"
+      ) {
+        expect(source).toContain('from "phial/app"');
+        expect(source).not.toContain('from "phial"');
+        expect(source).not.toContain("@hornjs/horn");
       } else {
-        expect(source).toContain('from "phial"');
         expect(source).not.toContain("@hornjs/horn");
       }
     }
@@ -85,7 +116,7 @@ describe("zero-config example phial surface", () => {
     expect(typecheckConfig).not.toContain("ignoreDeprecations");
 
     const hmrSmoke = readFileSync(resolve(repoRoot, "scripts/hmr-smoke.mjs"), "utf8");
-    expect(hmrSmoke).toContain("bin/phial.mjs");
+    expect(hmrSmoke).toContain('["exec", "tsx", "src/bin.ts"');
     expect(hmrSmoke).toContain("__phialHmrProbeLoads");
     expect(hmrSmoke).toContain("phial dev server:");
     expect(hmrSmoke).not.toContain("bin/horn.mjs");
@@ -95,7 +126,7 @@ describe("zero-config example phial surface", () => {
       resolve(repoRoot, "scripts/server-routes-smoke.mjs"),
       "utf8",
     );
-    expect(serverRoutesSmoke).toContain("bin/phial.mjs");
+    expect(serverRoutesSmoke).toContain('["exec", "tsx", "src/bin.ts"');
     expect(serverRoutesSmoke).toContain(".phial/types/middleware.d.ts");
     expect(serverRoutesSmoke).toContain(".phial/types/routes.d.ts");
     expect(serverRoutesSmoke).toContain(".phial/tsconfig.typecheck.json");

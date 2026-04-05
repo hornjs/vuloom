@@ -143,8 +143,8 @@ async function readLoadCount(page) {
 
 function startDevServer() {
   const child = spawn(
-    "node",
-    ["bin/phial.mjs", "dev", "examples/zero-config", "--port", String(DEV_PORT)],
+    "pnpm",
+    ["exec", "tsx", "src/bin.ts", "dev", "examples/zero-config", "--port", String(DEV_PORT)],
     {
       cwd: PACKAGE_ROOT,
       env: process.env,

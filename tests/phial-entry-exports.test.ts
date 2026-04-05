@@ -12,6 +12,7 @@ describe("phial public entry surface", () => {
   it("matches the phial-branded package and public API contract", async () => {
     const packageJson = await readFile(resolve(repoRoot, "package.json"), "utf8");
     const readme = await readFile(resolve(repoRoot, "README.md"), "utf8");
+    const sourceBin = await readFile(resolve(repoRoot, "src/bin.ts"), "utf8");
     const packageJsonData = JSON.parse(packageJson) as {
       bin?: Record<string, string>;
       files?: string[];
@@ -24,13 +25,16 @@ describe("phial public entry surface", () => {
     await expect(access(resolve(repoRoot, "bin/horn.mjs"))).rejects.toMatchObject({
       code: "ENOENT",
     });
+    await expect(access(resolve(repoRoot, "src/bin.ts"))).resolves.toBeUndefined();
 
     expect(packageJsonData.bin).toEqual({
-      phial: "./bin/phial.mjs",
+      phial: "./src/bin.ts",
     });
-    expect(packageJsonData.files).toEqual(
-      expect.arrayContaining(["dist", "bin/phial.mjs"]),
-    );
+    expect(packageJsonData.files).toEqual(expect.arrayContaining(["dist"]));
+    expect(packageJsonData.files).not.toContain("bin/phial.mjs");
+    expect(sourceBin).toContain("#!/usr/bin/env node");
+    expect(sourceBin).toContain('import { runPhialCli } from "./lib/cli/index.js";');
+    expect(sourceBin).toContain("process.exitCode = await runPhialCli(process.argv.slice(2));");
     expect(packageJsonData.exports).toMatchObject({
       ".": "./src/index.ts",
       "./vite-plugin": "./src/vite-plugin.ts",
@@ -61,7 +65,7 @@ describe("phial public entry surface", () => {
       expect.arrayContaining([
         expect.objectContaining({
           command: "vue-tsc",
-          args: expect.arrayContaining(["--noEmit", "-p", "tsconfig.app.json"]),
+          args: expect.arrayContaining(["--noEmit"]),
         }),
         expect.objectContaining({
           command: "tsc",
@@ -77,6 +81,10 @@ describe("phial public entry surface", () => {
     await expect(access(resolve(repoRoot, "dist/index.d.ts"))).resolves.toBeUndefined();
     await expect(access(resolve(repoRoot, "dist/vite-plugin.d.ts"))).resolves.toBeUndefined();
     await expect(access(resolve(repoRoot, "dist/cli.d.ts"))).resolves.toBeUndefined();
+    await expect(access(resolve(repoRoot, "dist/app.js"))).resolves.toBeUndefined();
+    await expect(access(resolve(repoRoot, "dist/server.js"))).resolves.toBeUndefined();
+    await expect(access(resolve(repoRoot, "dist/app.d.ts"))).resolves.toBeUndefined();
+    await expect(access(resolve(repoRoot, "dist/server.d.ts"))).resolves.toBeUndefined();
 
     const indexDist = await import(pathToFileURL(resolve(repoRoot, "dist/index.js")).href);
     const vitePluginDist = await import(
@@ -87,11 +95,13 @@ describe("phial public entry surface", () => {
     const cliTypes = await readFile(resolve(repoRoot, "dist/cli.d.ts"), "utf8");
     const indexTypes = await readFile(resolve(repoRoot, "dist/index.d.ts"), "utf8");
 
-    expect(indexDist).toHaveProperty("RouterView");
-    expect(indexDist).toHaveProperty("useAppData");
-    expect(indexDist).toHaveProperty("defer");
+    expect(indexDist).toHaveProperty("name");
+    expect(indexDist).toHaveProperty("version");
+    expect(indexDist).not.toHaveProperty("RouterView");
+    expect(indexDist).not.toHaveProperty("useAppData");
+    expect(indexDist).not.toHaveProperty("defer");
     expect(indexDist).not.toHaveProperty("runHornCli");
-    expect(indexTypes).toContain('export * from "vuepagelet";');
+    expect(indexTypes).toContain('export { name, version }');
 
     expect(vitePluginDist).toHaveProperty("defineConfig");
     expect(vitePluginDist).toHaveProperty("loadPhialConfig");
@@ -113,6 +123,18 @@ describe("phial public entry surface", () => {
     expect(cliDist).not.toHaveProperty("runHornCli");
     expect(cliTypes).toContain("runPhialCli");
     expect(cliTypes).not.toContain("runHornCli");
+
+    // app.ts and server.ts exports
+    const appTypes = await readFile(resolve(repoRoot, "dist/app.d.ts"), "utf8");
+    const serverTypes = await readFile(resolve(repoRoot, "dist/server.d.ts"), "utf8");
+
+    expect(appTypes).toContain("LoaderContext");
+    expect(appTypes).toContain("ActionContext");
+    expect(appTypes).toContain("PageMiddleware");
+    expect(serverTypes).toContain("ServerHandler");
+    expect(serverTypes).toContain("ServerMiddleware");
+    expect(serverTypes).toContain("InvocationContext");
+
     expect(vitePluginTypes).toContain("PhialConfig");
     expect(vitePluginTypes).toContain("PhialDevConfig");
     expect(vitePluginTypes).toContain("PhialPluginOptions");
@@ -148,31 +170,41 @@ describe("phial public entry surface", () => {
     expect(vitePluginTypes).not.toContain("HornStartServerHandle as HornStartServerHandle");
     expect(vitePluginTypes).not.toContain("HornStartServerOptions as HornStartServerOptions");
 
-    const { stdout, stderr } = await execFileAsync("node", ["bin/phial.mjs"], {
-      cwd: repoRoot,
-    });
-
-    expect(stdout).toContain("Usage: phial");
-    expect(stdout).toContain("phial dev");
-    expect(stdout).not.toContain("horn");
-    expect(stderr).toBe("");
-
-    const packRun = await execFileAsync("npm", ["pack", "--dry-run", "--json"], {
-      cwd: repoRoot,
-      env: {
-        ...process.env,
-        HOME: "/tmp",
-        npm_config_cache: "/tmp/npm-cache",
+    const prepareRun = await execFileAsync(
+      "pnpm",
+      ["exec", "prepare-publish", "--json", "--disable-lint"],
+      {
+        cwd: repoRoot,
       },
-    });
-    const packOutput = JSON.parse(packRun.stdout as string) as Array<{
-      files?: Array<{ path: string }>;
-    }>;
-    const packFiles = packOutput.flatMap((entry) => entry.files?.map((file) => file.path) ?? []);
+    );
+    const prepareOutput = JSON.parse(prepareRun.stdout as string) as {
+      packageJSON?: {
+        bin?: Record<string, string>;
+        files?: string[];
+      };
+      packedFiles?: Array<{ file: string }>;
+    };
+    const packedFiles = prepareOutput.packedFiles?.map((entry) => entry.file) ?? [];
 
-    expect(packFiles).toEqual(
+    expect(prepareOutput.packageJSON?.bin).toEqual({
+      phial: "./dist/bin.js",
+    });
+    expect(prepareOutput.packageJSON?.files).not.toContain("bin/phial.mjs");
+
+    const publishBin = resolve(repoRoot, ".prepare-publish/dist/bin.js");
+    const publishBinRun = await execFileAsync("node", [publishBin], {
+      cwd: repoRoot,
+    });
+
+    expect(publishBinRun.stdout).toContain("Usage: phial");
+    expect(publishBinRun.stdout).toContain("phial dev");
+    expect(publishBinRun.stdout).not.toContain("horn");
+    expect(publishBinRun.stderr).toBe("");
+
+    expect(packedFiles).toEqual(
       expect.arrayContaining([
-        "bin/phial.mjs",
+        "src/bin.ts",
+        "dist/bin.js",
         "dist/cli.js",
         "dist/cli.d.ts",
         "dist/index.js",
@@ -183,12 +215,14 @@ describe("phial public entry surface", () => {
     );
 
     expect(extractTopLevelTitle(readme)).toBe("phial");
-    expect(extractPublicEntryPoints(readme)).toEqual(["phial", "phial/vite-plugin"]);
-    expect(extractSectionParagraph(readme, "Public entry points")).toContain(
-      "phial re-exports the vuepagelet runtime surface",
-    );
+    expect(extractPublicEntryPoints(readme)).toEqual([
+      "phial",
+      "phial/vite-plugin",
+      "phial/app",
+      "phial/server",
+    ]);
     expect(hasLegacyPackageNames(readme)).toBe(false);
-  });
+  }, 20_000);
 });
 
 function parseCommandChain(script: string): Array<{ command: string; args: string[] }> {

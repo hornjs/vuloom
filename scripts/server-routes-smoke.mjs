@@ -31,7 +31,7 @@ async function main() {
 }
 
 async function verifyGeneratedMiddlewareTypes() {
-  await runCommand("node", ["bin/phial.mjs", "prepare", "examples/zero-config"]);
+  await runCommand("pnpm", ["exec", "tsx", "src/bin.ts", "prepare", "examples/zero-config"]);
 
   const typesFile = resolve(PACKAGE_ROOT, "examples/zero-config/.phial/types/middleware.d.ts");
   const source = await readFile(typesFile, "utf8");
@@ -73,10 +73,19 @@ async function verifyExampleProjectTypes() {
 }
 
 async function verifyProductionServerRoutes() {
-  await runCommand("node", ["bin/phial.mjs", "build", "examples/zero-config"]);
+  await runCommand("pnpm", ["exec", "tsx", "src/bin.ts", "build", "examples/zero-config"]);
 
   const server = startServer({
-    args: ["bin/phial.mjs", "start", "examples/zero-config", "--port", String(START_PORT)],
+    args: [
+      "pnpm",
+      "exec",
+      "tsx",
+      "src/bin.ts",
+      "start",
+      "examples/zero-config",
+      "--port",
+      String(START_PORT),
+    ],
     url: START_URL,
   });
 
@@ -90,7 +99,16 @@ async function verifyProductionServerRoutes() {
 
 async function verifyDevServerRoutes() {
   const server = startServer({
-    args: ["bin/phial.mjs", "dev", "examples/zero-config", "--port", String(DEV_PORT)],
+    args: [
+      "pnpm",
+      "exec",
+      "tsx",
+      "src/bin.ts",
+      "dev",
+      "examples/zero-config",
+      "--port",
+      String(DEV_PORT),
+    ],
     url: DEV_URL,
   });
 
@@ -182,7 +200,14 @@ async function verifyPathConflictDetection() {
 
     const result = await runCommand(
       "node",
-      [resolve(PACKAGE_ROOT, "bin/phial.mjs"), "prepare", root],
+      [
+        "pnpm",
+        "exec",
+        "tsx",
+        "src/bin.ts",
+        "prepare",
+        root,
+      ],
       {
         rejectOnFailure: false,
       },
@@ -212,7 +237,14 @@ async function verifyAmbiguousServerRouteDetection() {
 
     const result = await runCommand(
       "node",
-      [resolve(PACKAGE_ROOT, "bin/phial.mjs"), "prepare", root],
+      [
+        "pnpm",
+        "exec",
+        "tsx",
+        "src/bin.ts",
+        "prepare",
+        root,
+      ],
       {
         rejectOnFailure: false,
       },
