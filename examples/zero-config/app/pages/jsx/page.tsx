@@ -1,5 +1,5 @@
 import { computed, defineComponent } from "vue";
-import { RouterLink, useAppData, useRoute } from "phial";
+import { RouterLink, useAppData, useRoute } from "phial/app";
 
 interface AppData {
   theme: "light" | "sepia";
@@ -20,7 +20,7 @@ export default defineComponent({
         </p>
         <ul>
           <li>
-            Current path: <strong>{route.value.fullPath}</strong>
+            Current path: <strong>{route.fullPath}</strong>
           </li>
           <li>
             Theme from app loader: <strong>{theme.value}</strong>
