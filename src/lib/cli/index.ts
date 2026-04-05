@@ -1,10 +1,10 @@
 import { resolve } from "node:path";
 import process from "node:process";
 import {
-  buildHornApp,
-  prepareHornApp,
-  startHornDevServer,
-  startHornServer,
+  buildPhialApp,
+  preparePhialApp,
+  startPhialDevServer,
+  startPhialServer,
 } from "../vite-plugin/host";
 
 export async function runPhialCli(argv: string[] = process.argv.slice(2)): Promise<number> {
@@ -18,7 +18,7 @@ export async function runPhialCli(argv: string[] = process.argv.slice(2)): Promi
 
   if (command === "dev") {
     const options = parseSharedOptions(args);
-    const handle = await startHornDevServer(options);
+    const handle = await startPhialDevServer(options);
 
     console.log(`phial dev server: ${handle.url}`);
     registerShutdown(async () => {
@@ -30,20 +30,20 @@ export async function runPhialCli(argv: string[] = process.argv.slice(2)): Promi
 
   if (command === "build") {
     const options = parseSharedOptions(args);
-    await buildHornApp(options);
+    await buildPhialApp(options);
     return 0;
   }
 
   if (command === "prepare") {
     const options = parseSharedOptions(args);
-    const result = await prepareHornApp(options);
+    const result = await preparePhialApp(options);
     console.log(`phial prepare: wrote ${result.middlewareFile}`);
     return 0;
   }
 
   if (command === "start") {
     const options = parseSharedOptions(args);
-    const handle = await startHornServer(options);
+    const handle = await startPhialServer(options);
 
     console.log(`phial server: ${handle.url}`);
     registerShutdown(async () => {
