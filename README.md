@@ -18,15 +18,10 @@ export default defineConfig({
 });
 ```
 
-## Zero config example
-
-```bash
-pnpm build && node bin/phial.mjs dev examples/zero-config
-```
-
 ## Public entry points
 
+- `phial`
 - `phial/vite-plugin`
-- `vuepagelet`
 
 The CLI ships as `phial` via the package `bin` field and also lives at `bin/phial.mjs`.
+`phial` re-exports the `vuepagelet` runtime surface.

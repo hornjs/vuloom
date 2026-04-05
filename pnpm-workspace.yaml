@@ -1,0 +1,31 @@
+packages:
+  - packages/*
+  - docs
+
+catalog:
+  '@hornjs/fest': 0.0.4
+  '@types/node': ^24.11.0
+  '@vitest/browser-playwright': ^4.1.2
+  '@vue/server-renderer': ^3.5.30
+  cookie-es: ^2.0.0
+  fs-route-ir: 0.0.1
+  h3: ^1.15.0
+  lint-staged: ^16.3.3
+  playwright: ^1.58.2
+  prepare-publish: ^0.0.2
+  simple-git-hooks: 2.13.1
+  srvx: ^0.11.9
+  tsdown: ^0.21.3
+  tsx: ^4.21.0
+  typescript: ~5.9.3
+  vite: 8.0.0
+  vite-tsconfig-paths: ^6.1.1
+  vitest: 4.1.2
+  vue: ^3.5.30
+  vue-router: ^4.6.4
+
+catalogMode: prefer
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild

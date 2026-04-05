@@ -1,4 +1,6 @@
 import { defineConfig } from 'tsdown'
+import fs from 'node:fs'
+import path from 'node:path'
 
 export default defineConfig({
   entry: [
@@ -13,5 +15,14 @@ export default defineConfig({
   fixedExtension: false,
   deps: {
     skipNodeModulesBundle: true,
+  },
+  onSuccess() {
+    // Copy generated-routes.d.ts to dist for virtual module type support
+    const source = path.resolve("src/lib/generated-routes.d.ts")
+    const target = path.resolve("dist/lib/generated-routes.d.ts")
+    if (fs.existsSync(source)) {
+      fs.copyFileSync(source, target)
+      console.log(`Copied generated-routes.d.ts to dist/`)
+    }
   },
 })

@@ -19,78 +19,65 @@
   "files": [
     "dist",
     "bin/phial.mjs",
-    "src/lib/generated-routes.d.ts"
+    "LICENSE",
+    "README.md"
   ],
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "browser": "./dist/index.js",
-      "import": "./dist/index.js"
-    },
-    "./vite-plugin": {
-      "types": "./dist/vite-plugin.d.ts",
-      "import": "./dist/vite-plugin.js"
-    },
-    "./generated-routes-manifest": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-routes-modules": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-app-runtime": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-app-loader": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-app-middleware": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-app-plugin": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-server-routes": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-server-middleware": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-server-plugin": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
-    "./generated-config": {
-      "types": "./src/lib/generated-routes.d.ts"
-    },
+    ".": "./src/index.ts",
+    "./vite-plugin": "./src/vite-plugin.ts",
+    "./cli": "./src/cli.ts",
+    "./generated-routes-manifest": "./src/lib/generated-routes.d.ts",
+    "./generated-routes-modules": "./src/lib/generated-routes.d.ts",
+    "./generated-app-runtime": "./src/lib/generated-routes.d.ts",
+    "./generated-app-loader": "./src/lib/generated-routes.d.ts",
+    "./generated-app-middleware": "./src/lib/generated-routes.d.ts",
+    "./generated-app-plugin": "./src/lib/generated-routes.d.ts",
+    "./generated-server-routes": "./src/lib/generated-routes.d.ts",
+    "./generated-server-middleware": "./src/lib/generated-routes.d.ts",
+    "./generated-server-plugin": "./src/lib/generated-routes.d.ts",
+    "./generated-config": "./src/lib/generated-routes.d.ts",
     "./package.json": "./package.json"
   },
+  "publishConfig": {
+    "access": "public",
+    "directories": {
+      "src": "dist"
+    }
+  },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "tsdown",
     "dev": "tsdown --watch",
     "example:zero-config": "pnpm build && node bin/phial.mjs dev examples/zero-config",
     "test": "vitest",
     "smoke:hmr": "node scripts/hmr-smoke.mjs",
     "smoke:server-routes": "node scripts/server-routes-smoke.mjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "release": "bumpp",
-    "prepublishOnly": "pnpm run build"
+    "prepare:publish": "prepare-publish --print-tree",
+    "prepare:publish:dry-run": "prepare-publish --dry-run",
+    "prepublishOnly": "pnpm run build && pnpm run prepare:publish"
   },
   "dependencies": {
-    "@hornjs/fest": "catalog:",
+    "@hornjs/fest": "latest",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
-    "fs-route-ir": "catalog:",
-    "vuepagelet": "file:../vuepagelet"
+    "fs-route-ir": "latest",
+    "vuepagelet": "latest"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
     "@typescript/native-preview": "7.0.0-dev.20260328.1",
     "bumpp": "^11.0.1",
+    "playwright": "^1.58.2",
+    "prepare-publish": "^0.1.0",
     "tsdown": "^0.21.7",
     "typescript": "^6.0.2",
     "vite": "8.0.2",
     "vitest": "^4.1.2",
     "vue": "^3.5.30",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "vue-tsc": "^3.2.5"
   },
   "peerDependencies": {
     "vite": "^8.0.0",
