@@ -1,0 +1,8 @@
+{
+  "../../virtual:phial-client-entry": {
+    "file": "assets/client-entry-BEpK-se7.js",
+    "name": "client-entry",
+    "src": "../../virtual:phial-client-entry",
+    "isEntry": true
+  }
+}
