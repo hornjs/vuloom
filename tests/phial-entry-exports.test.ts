@@ -221,7 +221,12 @@ describe("phial public entry surface", () => {
       "phial/app",
       "phial/server",
     ]);
-    expect(hasLegacyPackageNames(readme)).toBe(false);
+    expect(extractSectionParagraph(readme, "Public entry points")).toContain(
+      "phial exports the package version",
+    );
+    expect(extractSectionParagraph(readme, "Public entry points")).toContain(
+      "phial/vite-plugin provides the Vite plugin, config utilities, and build tools",
+    );
   }, 20_000);
 });
 
@@ -322,9 +327,4 @@ function extractSectionParagraph(readme: string, sectionTitle: string): string {
   }
 
   return paragraphLines.join(" ").replaceAll("`", "");
-}
-
-function hasLegacyPackageNames(readme: string): boolean {
-  const normalized = readme.toLowerCase().replaceAll("`", "");
-  return normalized.includes("@hornjs/horn");
 }

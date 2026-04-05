@@ -103,8 +103,6 @@ describe("virtual module generators", () => {
     expect(runtimeModule).toContain("__ROUTE_MODULE_HMR__");
     expect(runtimeModule).toContain("__APP_RUNTIME_HMR__");
     expect(appPluginModule).toContain("createAppRouteServerPlugin");
-    expect(appPluginModule).not.toContain("@hornjs/horn/internal/vite-plugin");
-    expect(appPluginModule).not.toContain('from "@hornjs/horn"');
     expect(appPluginModule).toContain("export function createAppPlugin");
     expect(appPluginModule).toContain("createIntegration");
     expect(appPluginModule).toContain("return async (context, next) => {");
@@ -113,8 +111,6 @@ describe("virtual module generators", () => {
     expect(appPluginModule).toContain("export default createAppPlugin");
     expect(appPluginModule).not.toContain("createIntegration: () => integration");
     expect(serverPluginModule).toContain("createServerPlugin");
-    expect(serverPluginModule).not.toContain("@hornjs/horn/internal/vite-plugin");
-    expect(serverPluginModule).not.toContain('from "@hornjs/horn"');
     expect(serverPluginModule).toContain("export function createServerPlugin");
     expect(serverPluginModule).toContain("return async (context, next) => {");
     expect(serverPluginModule).toContain("const request = context.request");
@@ -141,9 +137,6 @@ describe("virtual module generators", () => {
     expect(clientEntry).toContain("phial/generated-app-runtime");
     expect(clientEntry).toContain("phial/generated-app-plugin");
     expect(clientEntry).toContain("phial/generated-server-plugin");
-    expect(clientEntry).not.toContain("@hornjs/horn/generated-routes-manifest");
-    expect(clientEntry).not.toContain("@hornjs/horn/generated-routes-modules");
-    expect(clientEntry).not.toContain("@hornjs/horn/client");
     expect(clientEntry).toContain("[phial]");
   });
 

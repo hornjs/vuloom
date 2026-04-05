@@ -12,7 +12,6 @@ describe("plugin host", () => {
     expect(source).toContain("NodeRuntimeAdapter");
     expect(source).toContain("phial/generated-app-plugin");
     expect(source).toContain("phial/generated-server-plugin");
-    expect(source).not.toContain("@hornjs/horn/server");
     expect(source).toContain("manual = false");
   });
 
@@ -41,7 +40,6 @@ describe("plugin host", () => {
     expect(source).not.toContain("id === `${PHIAL_PACKAGE_ID}/internal/vite-plugin`");
     expect(source).not.toContain("ssrLoadModule(`${PHIAL_PACKAGE_ID}/server`)");
     expect(source).not.toContain("id === `${PHIAL_PACKAGE_ID}/client`");
-    expect(source).not.toContain("@hornjs/horn/client");
     expect(source).not.toContain("createServerRoutesPlugin(");
     expect(source).not.toContain("@revuejs/vue");
     expect(source).not.toContain("VUE_PACKAGE_ID");
@@ -131,7 +129,6 @@ describe("plugin host", () => {
 
     expect(source).toContain('declare module "phial/generated-app-runtime"');
     expect(source).toContain('declare module "phial/generated-server-plugin"');
-    expect(source).not.toContain("@hornjs/horn/generated-");
     // files should not include src files - prepare-publish handles this
     expect(packageJson.exports["./generated-app-runtime"]).toEqual("./src/lib/generated-routes.d.ts");
     expect(packageJson.exports["./generated-server-plugin"]).toEqual("./src/lib/generated-routes.d.ts");

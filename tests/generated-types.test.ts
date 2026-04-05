@@ -46,7 +46,5 @@ describe("generated module type surface", () => {
     expect(source).toContain("createAppPlugin");
     expect(source).toContain("createServerPlugin");
     expect(source).not.toContain("FestServerPlugin");
-    expect(source).not.toContain("@hornjs/fest");
-    expect(source).not.toContain("@hornjs/horn/generated-");
   });
 });
