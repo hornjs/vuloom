@@ -5,8 +5,11 @@ import path from 'node:path'
 export default defineConfig({
   entry: [
     "src/index.ts",
-    "src/vite-plugin.ts",
+    "src/app.ts",
     "src/cli.ts",
+    "src/server.ts",
+    "src/vite-plugin.ts",
+    "src/bin.ts",
   ],
   platform: "node",
   dts: true,

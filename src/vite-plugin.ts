@@ -16,6 +16,8 @@ export type {
 } from "./lib/vite-plugin/index";
 export type {
   PhialConfig,
+  PhialConfigEnv,
+  PhialConfigExport,
   PhialDevConfig,
   PhialPluginOptions,
   PhialServerConfig,

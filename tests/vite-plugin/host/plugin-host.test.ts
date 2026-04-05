@@ -4,11 +4,11 @@ import { resolve } from "node:path";
 import { createPhialBuildServerEntryModule } from "../../../src/lib/vite-plugin/host/plugin-build";
 
 describe("plugin host", () => {
-  test("server entry targets fest plugins instead of horn server runtime", () => {
+  test("server entry targets sevok plugins instead of horn server runtime", () => {
     const source = createPhialBuildServerEntryModule();
 
-    expect(source).toContain("@hornjs/fest");
-    expect(source).toContain("@hornjs/fest/node");
+    expect(source).toContain("sevok");
+    expect(source).toContain("sevok/node");
     expect(source).toContain("NodeRuntimeAdapter");
     expect(source).toContain("phial/generated-app-plugin");
     expect(source).toContain("phial/generated-server-plugin");
@@ -16,7 +16,7 @@ describe("plugin host", () => {
     expect(source).toContain("manual = false");
   });
 
-  test("production host delegates node serving to fest adapter", () => {
+  test("production host delegates node serving to sevok adapter", () => {
     const source = readFileSync(
       resolve(import.meta.dirname, "../../../src/lib/vite-plugin/host/plugin-server.ts"),
       "utf8",
@@ -52,7 +52,7 @@ describe("plugin host", () => {
 
   test("runtime-facing dynamic imports are annotated for vite ssr analysis", () => {
     const appRoutesPluginSource = readFileSync(
-      resolve(import.meta.dirname, "../../../src/lib/server-plugins/app-routes-plugin.ts"),
+      resolve(import.meta.dirname, "../../../src/lib/app-routes/app-routes-plugin.ts"),
       "utf8",
     );
     const serverHostSource = readFileSync(
@@ -98,7 +98,8 @@ describe("plugin host", () => {
     expect(packageJson.exports).toHaveProperty("./generated-routes-modules");
     expect(packageJson.exports).toHaveProperty("./generated-config");
     expect(packageJson.exports).not.toHaveProperty("./internal/vite-plugin");
-    expect(packageJson.exports).not.toHaveProperty("./server");
+    expect(packageJson.exports).toHaveProperty("./server");
+    expect(packageJson.exports).toHaveProperty("./app");
     expect(packageJson.exports).not.toHaveProperty("./node");
     expect(packageJson.exports).not.toHaveProperty("./bun");
     expect(packageJson.exports).not.toHaveProperty("./deno");

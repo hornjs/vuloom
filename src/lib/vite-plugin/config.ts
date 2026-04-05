@@ -52,6 +52,23 @@ export interface PhialConfig {
   plugin?: PhialPluginOptions;
 }
 
+/**
+ * Config environment passed to config functions
+ */
+export interface PhialConfigEnv {
+  command: "build" | "serve";
+  mode: string;
+  isSsrBuild: boolean;
+  isPreview: boolean;
+}
+
+/**
+ * Config can be a static object or a function that returns a config (or Promise)
+ */
+export type PhialConfigExport =
+  | PhialConfig
+  | ((env: PhialConfigEnv) => PhialConfig | Promise<PhialConfig>);
+
 export interface LoadPhialConfigOptions {
   root?: string;
   configFile?: string;
@@ -70,7 +87,12 @@ export interface LoadedPhialConfig {
   env: Required<Pick<LoadPhialConfigOptions, "command" | "mode" | "isSsrBuild" | "isPreview">>;
 }
 
-export function defineConfig(config: PhialConfig): PhialConfig {
+/**
+ * Define phial configuration
+ * Accepts a static config object or a function that receives config env
+ * Function can return config synchronously or asynchronously
+ */
+export function defineConfig(config: PhialConfigExport): PhialConfigExport {
   return config;
 }
 
@@ -96,7 +118,12 @@ export async function loadPhialConfig(
   }
 
   const loaded = await loadConfigFromFile(env, configFile, searchRoot, options.logLevel ?? "error");
-  const config = (loaded?.config ?? {}) as PhialConfig;
+  const rawConfig = (loaded?.config ?? {}) as PhialConfigExport;
+
+  // Support function config (sync or async)
+  const config = await (typeof rawConfig === "function"
+    ? rawConfig(env)
+    : rawConfig);
 
   return {
     file: configFile,

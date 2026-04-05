@@ -9,7 +9,7 @@ import type { AddressInfo } from "node:net";
 import { dirname, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
-import { serve as createFestServer } from "@hornjs/fest";
+import { serve as createSevokServer } from "sevok";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import {
@@ -217,7 +217,7 @@ export async function createDevRequestHandler(
     `${PHIAL_RUNTIME_PACKAGE_ID}/generated-server-plugin`,
   )) as DevServerPluginModule | undefined;
 
-  return createFestServer({
+  return createSevokServer({
     manual: true,
     plugins: [
       serverPluginModule?.default?.() ?? (() => {}),

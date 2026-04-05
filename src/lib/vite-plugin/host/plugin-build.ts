@@ -32,9 +32,9 @@ export interface PhialBuildResult {
 
 export function createPhialBuildServerEntryModule(): string {
   return [
-    'import { Server } from "@hornjs/fest"',
-    'import { NodeRuntimeAdapter } from "@hornjs/fest/node"',
-    'import { serveStatic } from "@hornjs/fest/static"',
+    'import { Server } from "sevok"',
+    'import { NodeRuntimeAdapter } from "sevok/node"',
+    'import { serveStatic } from "sevok/static"',
     'import createAppPlugin from "phial/generated-app-plugin"',
     'import createServerPlugin from "phial/generated-server-plugin"',
     "",

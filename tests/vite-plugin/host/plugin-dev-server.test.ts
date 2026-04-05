@@ -1,8 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import {
   createAppRouteServerPlugin,
-  createServerRoutesPlugin,
-} from "../../../src/lib/server-plugins/index.ts";
+} from "../../../src/lib/app-routes/index.ts";
 import {
   createPhialViteInlineConfig,
   createDevRequestHandler,
@@ -10,23 +9,19 @@ import {
 } from "../../../src/lib/vite-plugin/host/plugin-dev-server.ts";
 
 describe("plugin dev server", () => {
-  test("creates a fest request handler from generated server/app plugins", async () => {
+  test("creates a sevok request handler from generated server/app plugins", async () => {
     const ssrLoadModule = vi.fn(async (id: string) => {
       if (id === "phial/generated-server-plugin") {
+        // New server plugin is a sevok plugin function that applies routes directly
         return {
-          default: () =>
-            createServerRoutesPlugin({
-              routes: [
-                {
-                  id: "api/ping",
-                  path: "/api/ping",
-                  definition: {
-                    GET: async () => new Response("pong"),
-                  },
-                },
-              ],
-              middlewareRegistry: {},
-            }),
+          default: () => (server: { options: { routes?: Record<string, unknown>; middleware?: unknown[] } }) => {
+            server.options.routes = {
+              ...server.options.routes,
+              "/api/ping": {
+                GET: async () => new Response("pong"),
+              },
+            };
+          },
         };
       }
 

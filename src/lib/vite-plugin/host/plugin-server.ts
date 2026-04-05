@@ -1,4 +1,4 @@
-import { type RuntimeAdapter, type Server } from "@hornjs/fest";
+import { type RuntimeAdapter, type Server } from "sevok";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
