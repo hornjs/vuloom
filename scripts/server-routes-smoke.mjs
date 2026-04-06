@@ -199,9 +199,8 @@ async function verifyPathConflictDetection() {
     });
 
     const result = await runCommand(
-      "node",
+      "pnpm",
       [
-        "pnpm",
         "exec",
         "tsx",
         "src/bin.ts",
@@ -236,9 +235,8 @@ async function verifyAmbiguousServerRouteDetection() {
     });
 
     const result = await runCommand(
-      "node",
+      "pnpm",
       [
-        "pnpm",
         "exec",
         "tsx",
         "src/bin.ts",
@@ -302,7 +300,7 @@ function assertDeepEqual(actual, expected, message) {
 }
 
 function startServer(options) {
-  const child = spawn("node", options.args, {
+  const child = spawn(options.args[0], options.args.slice(1), {
     cwd: PACKAGE_ROOT,
     env: process.env,
     stdio: ["ignore", "pipe", "pipe"],
