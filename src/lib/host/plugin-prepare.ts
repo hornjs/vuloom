@@ -1,6 +1,6 @@
-import { loadPhialConfig } from "../config";
-import { scanRoutes } from "../scanners/routes-scanner";
-import { writePhialProjectTypes, type GeneratedPhialTypesResult } from "../scanners/types-generator";
+import { loadPhialConfig } from "../config/index.ts";
+import { scanRoutes } from "../vite/scanners/routes-scanner";
+import { writePhialProjectTypes, type GeneratedPhialTypesResult } from "../vite/scanners/types-generator";
 
 export interface PhialPrepareOptions {
   root?: string;

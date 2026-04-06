@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import {
   scanServerMiddlewareFiles,
   scanServerRoutes,
-} from "../../../src/lib/vite-plugin/scanners/index.ts";
+} from "../../../src/lib/vite/scanners/index.ts";
 
 const tempRoots: string[] = [];
 

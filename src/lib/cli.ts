@@ -5,7 +5,7 @@ import {
   preparePhialApp,
   startPhialDevServer,
   startPhialServer,
-} from "../vite-plugin/host";
+} from "./host";
 
 export async function runPhialCli(argv: string[] = process.argv.slice(2)): Promise<number> {
   const args = [...argv];
@@ -111,13 +111,12 @@ function parseSharedOptions(argv: string[]) {
 }
 
 function registerShutdown(shutdown: () => Promise<void>) {
-  process.on("SIGINT", () => {
+  const handler = () => {
     void shutdown();
-  });
+  };
 
-  process.on("SIGTERM", () => {
-    void shutdown();
-  });
+  process.once("SIGINT", handler);
+  process.once("SIGTERM", handler);
 }
 
 function printUsage() {

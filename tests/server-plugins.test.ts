@@ -1,6 +1,7 @@
-import { InvocationContext, createContextKey, type ServerMiddleware } from "sevok";
+import { InvocationContext, type ServerMiddleware, type ServerMiddlewareResolver } from "sevok";
 import { describe, expect, test, vi } from "vitest";
 import { defineComponent } from "vue";
+import type { RouteRuntimeIntegration } from "vuepagelet/integration";
 import { createAppRouteServerPlugin } from "../src/lib/app-routes/index.ts";
 import { toSevokServerOptions } from "../src/lib/server-routes/index.ts";
 import type { ServerRouteRecord } from "../src/lib/server-routes/types";
@@ -29,14 +30,20 @@ async function runMiddlewareStack(
   middleware: ServerMiddleware[],
   request: Request,
   terminal: (request: Request) => Promise<Response>,
+  resolve?: ServerMiddlewareResolver,
 ): Promise<Response> {
   async function dispatch(index: number, context: InvocationContext): Promise<Response> {
-    const current = middleware[index];
-    if (!current) {
+    const entry = middleware[index];
+    if (entry == null) {
       return terminal(context.request);
     }
 
-    return current(context, (nextContext) => dispatch(index + 1, nextContext));
+    const fn = typeof entry === "function" ? entry : resolve?.(entry);
+    if (!fn) {
+      return dispatch(index + 1, context);
+    }
+
+    return fn(context, (nextContext) => dispatch(index + 1, nextContext));
   }
 
   return dispatch(0, createMockContext(request));
@@ -69,7 +76,7 @@ describe("server plugins", () => {
     const appIntegration = {
       match: vi.fn(() => ({ route: { id: "page" } })),
       handleRequest: appHandleRequest,
-    };
+    } as unknown as RouteRuntimeIntegration;
 
     const serverSetup = createServerSetup({
       routes: [
@@ -108,7 +115,7 @@ describe("server plugins", () => {
     const integration = {
       match: vi.fn(() => null),
       handleRequest,
-    };
+    } as unknown as RouteRuntimeIntegration;
     const plugin = createAppRouteServerPlugin({
       routes: [],
       createIntegration: () => integration,
@@ -133,7 +140,7 @@ describe("server plugins", () => {
     const integration = {
       match: vi.fn(() => ({ route: { id: "page" } })),
       handleRequest,
-    };
+    } as unknown as RouteRuntimeIntegration;
     const plugin = createAppRouteServerPlugin({
       routes: [],
       createIntegration: () => integration,

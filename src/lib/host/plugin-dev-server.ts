@@ -20,8 +20,8 @@ import {
   type PluginOption,
   type ViteDevServer,
 } from "vite";
-import { loadPhialConfig, type PhialConfig, type LoadPhialConfigOptions } from "../config";
-import { DEFAULT_CLIENT_ENTRY_PUBLIC_PATH, phialVitePlugin } from "../index";
+import { loadPhialConfig, type PhialConfig, type LoadPhialConfigOptions } from "../config/index.ts";
+import { DEFAULT_CLIENT_ENTRY_PUBLIC_PATH, phialVitePlugin } from "../vite";
 
 export interface PhialDevServerOptions extends LoadPhialConfigOptions {
   host?: string;
@@ -162,6 +162,8 @@ export function createPhialViteInlineConfig(
   return mergeConfig(baseConfig, mergedViteConfig);
 }
 
+let cachedHandler: Awaited<ReturnType<typeof createDevRequestHandler>> | null = null;
+
 async function handleRequest(
   vite: ViteDevServer,
   req: IncomingMessage,
@@ -182,11 +184,15 @@ async function handleRequest(
     if (res.writableEnded) {
       return;
     }
-    const handler = await createDevRequestHandler(vite, {
-      clientEntryPath: DEFAULT_CLIENT_ENTRY_PUBLIC_PATH,
-    });
+
+    if (!cachedHandler) {
+      cachedHandler = await createDevRequestHandler(vite, {
+        clientEntryPath: DEFAULT_CLIENT_ENTRY_PUBLIC_PATH,
+      });
+    }
+
     const request = createNodeRequest(req);
-    const response = await handler.fetch(request);
+    const response = await cachedHandler.fetch(request);
 
     await writeNodeResponse(res, response, req.method);
   } catch (error) {
@@ -330,7 +336,7 @@ function isEncryptedRequest(req: IncomingMessage): boolean {
 function createPhialSourceEntryPoints(): PhialSourceEntryPoints {
   const entries = {
     root: resolve(PHIAL_PACKAGE_ROOT, "src/index.ts"),
-    plugin: resolve(PHIAL_PACKAGE_ROOT, "src/vite-plugin.ts"),
+    plugin: resolve(PHIAL_PACKAGE_ROOT, "src/vite.ts"),
   };
 
   return Object.fromEntries(Object.entries(entries).filter(([, file]) => existsSync(file)));
@@ -351,7 +357,7 @@ function createPhialSourceRuntimePlugin(
         return sourceEntryPoints?.root ?? null;
       }
 
-      if (id === `${PHIAL_PACKAGE_ID}/vite-plugin`) {
+      if (id === `${PHIAL_PACKAGE_ID}/vite` || id === `${PHIAL_PACKAGE_ID}/vite-plugin`) {
         return sourceEntryPoints?.plugin ?? null;
       }
 
@@ -367,7 +373,7 @@ function resolvePhialPackageRoot(): string {
   if (
     existsSync(resolve(packageRoot, "package.json")) &&
     existsSync(resolve(packageRoot, "src/index.ts")) &&
-    existsSync(resolve(packageRoot, "src/vite-plugin.ts"))
+    existsSync(resolve(packageRoot, "src/vite.ts"))
   ) {
     return packageRoot;
   }

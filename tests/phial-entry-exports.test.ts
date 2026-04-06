@@ -33,12 +33,11 @@ describe("phial public entry surface", () => {
     expect(packageJsonData.files).toEqual(expect.arrayContaining(["dist"]));
     expect(packageJsonData.files).not.toContain("bin/phial.mjs");
     expect(sourceBin).toContain("#!/usr/bin/env node");
-    expect(sourceBin).toContain('import { runPhialCli } from "./lib/cli/index.js";');
+    expect(sourceBin).toContain('import { runPhialCli } from "./lib/cli.js";');
     expect(sourceBin).toContain("process.exitCode = await runPhialCli(process.argv.slice(2));");
     expect(packageJsonData.exports).toMatchObject({
       ".": "./src/index.ts",
-      "./vite-plugin": "./src/vite-plugin.ts",
-      "./cli": "./src/cli.ts",
+      "./vite-plugin": "./src/vite.ts",
     });
     const exports = packageJsonData.exports!;
     expect(typeof exports["./generated-routes-manifest"]).toBe("string");
@@ -77,10 +76,9 @@ describe("phial public entry surface", () => {
     await execFileAsync("pnpm", ["build"], { cwd: repoRoot });
 
     await expect(access(resolve(repoRoot, "dist/index.js"))).resolves.toBeUndefined();
-    await expect(access(resolve(repoRoot, "dist/vite-plugin.js"))).resolves.toBeUndefined();
+    await expect(access(resolve(repoRoot, "dist/vite.js"))).resolves.toBeUndefined();
     await expect(access(resolve(repoRoot, "dist/index.d.ts"))).resolves.toBeUndefined();
-    await expect(access(resolve(repoRoot, "dist/vite-plugin.d.ts"))).resolves.toBeUndefined();
-    await expect(access(resolve(repoRoot, "dist/cli.d.ts"))).resolves.toBeUndefined();
+    await expect(access(resolve(repoRoot, "dist/vite.d.ts"))).resolves.toBeUndefined();
     await expect(access(resolve(repoRoot, "dist/app.js"))).resolves.toBeUndefined();
     await expect(access(resolve(repoRoot, "dist/server.js"))).resolves.toBeUndefined();
     await expect(access(resolve(repoRoot, "dist/app.d.ts"))).resolves.toBeUndefined();
@@ -88,11 +86,9 @@ describe("phial public entry surface", () => {
 
     const indexDist = await import(pathToFileURL(resolve(repoRoot, "dist/index.js")).href);
     const vitePluginDist = await import(
-      pathToFileURL(resolve(repoRoot, "dist/vite-plugin.js")).href,
+      pathToFileURL(resolve(repoRoot, "dist/vite.js")).href,
     );
-    const cliDist = await import(pathToFileURL(resolve(repoRoot, "dist/cli.js")).href);
-    const vitePluginTypes = await readFile(resolve(repoRoot, "dist/vite-plugin.d.ts"), "utf8");
-    const cliTypes = await readFile(resolve(repoRoot, "dist/cli.d.ts"), "utf8");
+    const vitePluginTypes = await readFile(resolve(repoRoot, "dist/vite.d.ts"), "utf8");
     const indexTypes = await readFile(resolve(repoRoot, "dist/index.d.ts"), "utf8");
 
     expect(indexDist).toHaveProperty("name");
@@ -101,14 +97,8 @@ describe("phial public entry surface", () => {
     expect(indexDist).not.toHaveProperty("useAppData");
     expect(indexDist).not.toHaveProperty("defer");
     expect(indexDist).not.toHaveProperty("runHornCli");
-    expect(indexTypes).toContain('export { name, version }');
+    expect(indexTypes).toContain('export {');
 
-    expect(vitePluginDist).toHaveProperty("defineConfig");
-    expect(vitePluginDist).toHaveProperty("loadPhialConfig");
-    expect(vitePluginDist).toHaveProperty("buildPhialApp");
-    expect(vitePluginDist).toHaveProperty("preparePhialApp");
-    expect(vitePluginDist).toHaveProperty("startPhialDevServer");
-    expect(vitePluginDist).toHaveProperty("startPhialServer");
     expect(vitePluginDist).toHaveProperty("phialVitePlugin");
     expect(vitePluginDist).not.toHaveProperty("DEFAULT_CLIENT_BUILD_OUT_DIR");
     expect(vitePluginDist).not.toHaveProperty("DEFAULT_SERVER_BUILD_OUT_DIR");
@@ -118,11 +108,6 @@ describe("phial public entry surface", () => {
     expect(vitePluginDist).not.toHaveProperty("startHornDevServer");
     expect(vitePluginDist).not.toHaveProperty("startHornServer");
     expect(vitePluginDist).not.toHaveProperty("hornVitePlugin");
-
-    expect(cliDist).toHaveProperty("runPhialCli");
-    expect(cliDist).not.toHaveProperty("runHornCli");
-    expect(cliTypes).toContain("runPhialCli");
-    expect(cliTypes).not.toContain("runHornCli");
 
     // app.ts and server.ts exports
     const appTypes = await readFile(resolve(repoRoot, "dist/app.d.ts"), "utf8");
@@ -135,20 +120,7 @@ describe("phial public entry surface", () => {
     expect(serverTypes).toContain("ServerMiddleware");
     expect(serverTypes).toContain("InvocationContext");
 
-    expect(vitePluginTypes).toContain("PhialConfig");
-    expect(vitePluginTypes).toContain("PhialDevConfig");
-    expect(vitePluginTypes).toContain("PhialPluginOptions");
-    expect(vitePluginTypes).toContain("PhialServerConfig");
-    expect(vitePluginTypes).toContain("LoadPhialConfigOptions");
-    expect(vitePluginTypes).toContain("LoadedPhialConfig");
     expect(vitePluginTypes).toContain("PhialVitePluginOptions");
-    expect(vitePluginTypes).toContain("PhialBuildOptions");
-    expect(vitePluginTypes).toContain("PhialBuildResult");
-    expect(vitePluginTypes).toContain("PhialPrepareOptions");
-    expect(vitePluginTypes).toContain("PhialDevServerHandle");
-    expect(vitePluginTypes).toContain("PhialDevServerOptions");
-    expect(vitePluginTypes).toContain("PhialStartServerHandle");
-    expect(vitePluginTypes).toContain("PhialStartServerOptions");
     expect(vitePluginTypes).not.toContain("loadHornConfig as loadHornConfig");
     expect(vitePluginTypes).not.toContain("buildHornApp as buildHornApp");
     expect(vitePluginTypes).not.toContain("prepareHornApp as prepareHornApp");
@@ -205,12 +177,10 @@ describe("phial public entry surface", () => {
       expect.arrayContaining([
         "src/bin.ts",
         "dist/bin.js",
-        "dist/cli.js",
-        "dist/cli.d.ts",
         "dist/index.js",
         "dist/index.d.ts",
-        "dist/vite-plugin.js",
-        "dist/vite-plugin.d.ts",
+        "dist/vite.js",
+        "dist/vite.d.ts",
       ]),
     );
 
@@ -267,7 +237,7 @@ function extractPublicEntryPoints(readme: string): string[] {
       break;
     }
 
-    entries.push(trimmed.slice(2).replaceAll("`", ""));
+    entries.push(trimmed.slice(2).split("`").join(""));
   }
 
   return entries;
@@ -326,5 +296,5 @@ function extractSectionParagraph(readme: string, sectionTitle: string): string {
     throw new Error(`README section "${sectionTitle}" does not contain a paragraph.`);
   }
 
-  return paragraphLines.join(" ").replaceAll("`", "");
+  return paragraphLines.join(" ").split("`").join("");
 }

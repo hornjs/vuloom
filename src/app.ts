@@ -52,6 +52,7 @@ export type {
 // 函数类型
 export type {
   PageMiddleware,
+  PageRouteRecord,
   LoaderResult,
   ActionResult,
 } from "vuepagelet/integration";

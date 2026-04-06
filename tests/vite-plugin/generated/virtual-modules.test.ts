@@ -1,9 +1,5 @@
 import { describe, expect, test } from "vitest";
-import {
-  GENERATED_APP_PLUGIN_ID,
-  GENERATED_SERVER_PLUGIN_ID,
-  resolveVirtualModuleId,
-} from "../../../src/lib/vite-plugin/generated/virtual-modules.ts";
+import { resolveVirtualModuleId } from "../../../src/lib/vite/generated/virtual-modules.ts";
 import {
   createClientEntryModule,
   createVirtualAppRuntimeModule,
@@ -13,11 +9,11 @@ import {
   createVirtualRoutesModulesModule,
   createVirtualServerPluginModule,
   createVirtualServerRoutesModule,
-} from "../../../src/lib/vite-plugin/generated/index.ts";
+} from "../../../src/lib/vite/generated/index.ts";
 import {
   createRouteManifest,
   type ScannedRoutesResult,
-} from "../../../src/lib/vite-plugin/scanners/index.ts";
+} from "../../../src/lib/vite/scanners/index.ts";
 
 const scannedResult: ScannedRoutesResult = {
   root: "/repo",
@@ -85,8 +81,8 @@ describe("virtual module generators", () => {
   test("generates routes manifest and runtime modules", () => {
     const manifestModule = createVirtualRoutesManifestModule(scannedResult);
     const runtimeModule = createVirtualAppRuntimeModule(scannedResult);
-    const appPluginModule = createVirtualAppPluginModule(scannedResult);
-    const serverPluginModule = createVirtualServerPluginModule(scannedResult);
+    const appPluginModule = createVirtualAppPluginModule();
+    const serverPluginModule = createVirtualServerPluginModule();
     const routesModule = createVirtualRoutesModulesModule(scannedResult, {
       moduleImportMode: "eager",
     });

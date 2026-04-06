@@ -6,7 +6,7 @@ import {
   resolveSingleEntryFile,
   type ScannedRouteModule,
   type ScannedServerRoute,
-} from "../../../src/lib/vite-plugin/scanners/index.ts";
+} from "../../../src/lib/vite/scanners/index.ts";
 
 describe("scanner-utils", () => {
   test("normalizes extension arrays and strips vue from directory middleware extensions", () => {

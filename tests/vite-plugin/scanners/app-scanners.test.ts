@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { scanAppPageRoutes, scanAppRuntime } from "../../../src/lib/vite-plugin/scanners/index.ts";
+import { scanAppPageRoutes, scanAppRuntime } from "../../../src/lib/vite/scanners/index.ts";
 
 const tempRoots: string[] = [];
 

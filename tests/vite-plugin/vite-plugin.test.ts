@@ -1,18 +1,19 @@
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { afterEach, describe, expect, test, vi, type ResolvedConfig } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import type { ResolvedConfig, Plugin } from "vite";
 import {
   DEFAULT_PHIAL_CONFIG_FILES,
   isPhialConfigFile,
   loadPhialConfig,
-} from "../../src/lib/vite-plugin/config.ts";
+} from "../../src/lib/config/index.ts";
 import {
   GENERATED_APP_PLUGIN_ID,
   GENERATED_SERVER_PLUGIN_ID,
   resolveVirtualModuleId,
-} from "../../src/lib/vite-plugin/generated/virtual-modules.ts";
-import { phialVitePlugin } from "../../src/vite-plugin.ts";
+} from "../../src/lib/vite/generated/virtual-modules.ts";
+import { phialVitePlugin } from "../../src/vite.ts";
 
 const tempRoots: string[] = [];
 
@@ -20,6 +21,31 @@ async function createTempRoot(): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "phial-vite-plugin-"));
   tempRoots.push(root);
   return root;
+}
+
+async function callResolveId(
+  plugin: Plugin,
+  source: string,
+): Promise<string | null | undefined> {
+  const handler = plugin.resolveId;
+  if (typeof handler === "function") {
+    return handler.call({} as never, source, undefined, { isEntry: false }) as Promise<string | null | undefined>;
+  }
+  if (handler?.handler) {
+    return handler.handler.call({} as never, source, undefined, { isEntry: false }) as Promise<string | null | undefined>;
+  }
+  return undefined;
+}
+
+async function callLoad(plugin: Plugin, id: string): Promise<string | null | undefined> {
+  const handler = plugin.load;
+  if (typeof handler === "function") {
+    return handler.call({} as never, id) as Promise<string | null | undefined>;
+  }
+  if (handler?.handler) {
+    return handler.handler.call({} as never, id) as Promise<string | null | undefined>;
+  }
+  return undefined;
 }
 
 async function writeFiles(root: string, files: Record<string, string>): Promise<void> {
@@ -75,18 +101,31 @@ describe("phialVitePlugin", () => {
       extensions: [".vue", ".ts"],
     });
 
-    plugin.configResolved?.({
-      root,
-      command: "serve",
-      mode: "development",
-      logLevel: "info",
-      build: {
-        ssr: false,
-      },
-    } as ResolvedConfig);
+    const configResolved = plugin.configResolved;
+    if (typeof configResolved === "function") {
+      configResolved.call({} as never, {
+        root,
+        command: "serve",
+        mode: "development",
+        logLevel: "info",
+        build: {
+          ssr: false,
+        },
+      } as ResolvedConfig);
+    } else if (configResolved?.handler) {
+      configResolved.handler.call({} as never, {
+        root,
+        command: "serve",
+        mode: "development",
+        logLevel: "info",
+        build: {
+          ssr: false,
+        },
+      } as ResolvedConfig);
+    }
 
-    const appPluginId = plugin.resolveId?.(GENERATED_APP_PLUGIN_ID);
-    const serverPluginId = plugin.resolveId?.(GENERATED_SERVER_PLUGIN_ID);
+    const appPluginId = await callResolveId(plugin, GENERATED_APP_PLUGIN_ID);
+    const serverPluginId = await callResolveId(plugin, GENERATED_SERVER_PLUGIN_ID);
 
     expect(appPluginId).toBe(`\0${GENERATED_APP_PLUGIN_ID}`);
     expect(serverPluginId).toBe(`\0${GENERATED_SERVER_PLUGIN_ID}`);
@@ -97,8 +136,8 @@ describe("phialVitePlugin", () => {
       "\0phial/generated-server-plugin",
     );
 
-    const appPluginModule = await plugin.load?.(appPluginId as string);
-    const serverPluginModule = await plugin.load?.(serverPluginId as string);
+    const appPluginModule = await callLoad(plugin, appPluginId as string);
+    const serverPluginModule = await callLoad(plugin, serverPluginId as string);
 
     expect(appPluginModule).toContain("createAppRouteServerPlugin");
     expect(appPluginModule).toContain("export default createAppPlugin");
@@ -126,45 +165,91 @@ describe("phialVitePlugin", () => {
     const invalidateModule = vi.fn();
     const send = vi.fn();
 
-    plugin.configResolved?.({
-      root,
-      command: "serve",
-      mode: "development",
-      logLevel: "info",
-      build: {
-        ssr: false,
-      },
-    } as ResolvedConfig);
+    const configResolved2 = plugin.configResolved;
+    if (typeof configResolved2 === "function") {
+      configResolved2.call({} as never, {
+        root,
+        command: "serve",
+        mode: "development",
+        logLevel: "info",
+        build: {
+          ssr: false,
+        },
+      } as ResolvedConfig);
+    } else if (configResolved2?.handler) {
+      configResolved2.handler.call({} as never, {
+        root,
+        command: "serve",
+        mode: "development",
+        logLevel: "info",
+        build: {
+          ssr: false,
+        },
+      } as ResolvedConfig);
+    }
 
-    plugin.configureServer?.({
-      watcher: {
-        on(event: string, handler: (file: string) => void) {
-          const handlers = events.get(event) ?? [];
-          handlers.push(handler);
-          events.set(event, handlers);
-          return this;
-        },
-      },
-      moduleGraph: {
-        getModuleById(id: string) {
-          return { id };
-        },
-        invalidateModule,
-      },
-      environments: {
-        client: {
-          hot: {
-            send,
+    const configureServer = plugin.configureServer;
+    if (typeof configureServer === "function") {
+      configureServer.call({} as never, {
+        watcher: {
+          on(event: string, handler: (file: string) => void) {
+            const handlers = events.get(event) ?? [];
+            handlers.push(handler);
+            events.set(event, handlers);
+            return this;
           },
         },
-      },
-      ws: {
-        send,
-      },
-      middlewares: {
-        use() {},
-      },
-    } as never);
+        moduleGraph: {
+          getModuleById(id: string) {
+            return { id };
+          },
+          invalidateModule,
+        },
+        environments: {
+          client: {
+            hot: {
+              send,
+            },
+          },
+        },
+        ws: {
+          send,
+        },
+        middlewares: {
+          use() {},
+        },
+      } as never);
+    } else if (configureServer?.handler) {
+      configureServer.handler.call({} as never, {
+        watcher: {
+          on(event: string, handler: (file: string) => void) {
+            const handlers = events.get(event) ?? [];
+            handlers.push(handler);
+            events.set(event, handlers);
+            return this;
+          },
+        },
+        moduleGraph: {
+          getModuleById(id: string) {
+            return { id };
+          },
+          invalidateModule,
+        },
+        environments: {
+          client: {
+            hot: {
+              send,
+            },
+          },
+        },
+        ws: {
+          send,
+        },
+        middlewares: {
+          use() {},
+        },
+      } as never);
+    }
 
     for (const handler of events.get("ready") ?? []) {
       handler(root);

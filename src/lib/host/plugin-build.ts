@@ -10,8 +10,8 @@ import {
   type PluginOption,
 } from "vite";
 import { loadPhialConfig, type PhialConfig, type LoadPhialConfigOptions } from "../config";
-import { createClientEntryModule } from "../generated/client-entry";
-import { phialVitePlugin } from "../index";
+import { createClientEntryModule } from "../vite/generated/client-entry";
+import { phialVitePlugin } from "../vite";
 
 const PHIAL_BUILD_CLIENT_ENTRY_ID = "virtual:phial-client-entry";
 const RESOLVED_PHIAL_BUILD_CLIENT_ENTRY_ID = "\0virtual:phial-client-entry";

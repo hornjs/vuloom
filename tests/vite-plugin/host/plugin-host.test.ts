@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { createPhialBuildServerEntryModule } from "../../../src/lib/vite-plugin/host/plugin-build";
+import { createPhialBuildServerEntryModule } from "../../../src/lib/host/plugin-build";
 
 describe("plugin host", () => {
   test("server entry targets sevok plugins instead of horn server runtime", () => {
@@ -17,7 +17,7 @@ describe("plugin host", () => {
 
   test("production host delegates node serving to sevok adapter", () => {
     const source = readFileSync(
-      resolve(import.meta.dirname, "../../../src/lib/vite-plugin/host/plugin-server.ts"),
+      resolve(import.meta.dirname, "../../../src/lib/host/plugin-server.ts"),
       "utf8",
     );
 
@@ -28,14 +28,14 @@ describe("plugin host", () => {
 
   test("dev host only remaps phial package source entrypoints that remain public", () => {
     const source = readFileSync(
-      resolve(import.meta.dirname, "../../../src/lib/vite-plugin/host/plugin-dev-server.ts"),
+      resolve(import.meta.dirname, "../../../src/lib/host/plugin-dev-server.ts"),
       "utf8",
     );
 
     expect(source).toContain('const PHIAL_PACKAGE_ID = "phial";');
     expect(source).toContain('return resolve(currentDir, "../../../..");');
     expect(source).not.toContain('resolveWorkspacePackageRoot("horn")');
-    expect(source).toContain("id === `${PHIAL_PACKAGE_ID}/vite-plugin`");
+    expect(source).toContain("id === `${PHIAL_PACKAGE_ID}/vite`");
     expect(source).not.toContain("id === `${PHIAL_PACKAGE_ID}/server`");
     expect(source).not.toContain("id === `${PHIAL_PACKAGE_ID}/internal/vite-plugin`");
     expect(source).not.toContain("ssrLoadModule(`${PHIAL_PACKAGE_ID}/server`)");
@@ -54,7 +54,7 @@ describe("plugin host", () => {
       "utf8",
     );
     const serverHostSource = readFileSync(
-      resolve(import.meta.dirname, "../../../src/lib/vite-plugin/host/plugin-server.ts"),
+      resolve(import.meta.dirname, "../../../src/lib/host/plugin-server.ts"),
       "utf8",
     );
 

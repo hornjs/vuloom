@@ -1,7 +1,7 @@
 import { basename, extname, relative, resolve } from "node:path";
 import type { Plugin, ResolvedConfig, ViteDevServer } from "vite";
-import type { PhialPluginOptions } from "./config";
-import { isPhialConfigFile, loadPhialConfig, type LoadedPhialConfig } from "./config";
+import type { PhialPluginOptions } from "../config";
+import { isPhialConfigFile, loadPhialConfig, type LoadedPhialConfig } from "../config";
 import { createClientEntryModule } from "./generated/client-entry";
 import { scanRoutes } from "./scanners/routes-scanner";
 import type { ScannedRoutesResult } from "./scanners/route-manifest";

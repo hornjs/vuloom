@@ -1,5 +1,6 @@
 import type { RouteTree } from "fs-route-ir";
 import type { ModuleResolver } from "../app-routes/types";
+export type { ModuleResolver };
 import type { ServerHandler, ServerMethodHandlers, ServerMiddleware } from "sevok";
 
 export type ServerRouteEntryKind = "route" | "directory-middleware";

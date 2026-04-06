@@ -6,7 +6,7 @@ import {
   createPhialViteInlineConfig,
   createDevRequestHandler,
   resolveDevServerUrl,
-} from "../../../src/lib/vite-plugin/host/plugin-dev-server.ts";
+} from "../../../src/lib/host/plugin-dev-server.ts";
 
 describe("plugin dev server", () => {
   test("creates a sevok request handler from generated server/app plugins", async () => {
@@ -33,7 +33,7 @@ describe("plugin dev server", () => {
               createIntegration: () => ({
                 match: (pathname: string) => (pathname === "/" ? { route: { id: "page" } } : null),
                 handleRequest: async () => new Response("page html", { status: 200 }),
-              }),
+              }) as never,
             }),
         };
       }

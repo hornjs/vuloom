@@ -8,7 +8,7 @@ import {
   createRouteTypesDeclaration,
   writePhialProjectTypes,
   type ScannedRoutesResult,
-} from "../../../src/lib/vite-plugin/scanners/index.ts";
+} from "../../../src/lib/vite/scanners/index.ts";
 
 const tempRoots: string[] = [];
 

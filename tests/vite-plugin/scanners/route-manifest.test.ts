@@ -3,7 +3,7 @@ import {
   collectAppPagePaths,
   createRouteManifest,
   type ScannedRouteModule,
-} from "../../../src/lib/vite-plugin/scanners/index.ts";
+} from "../../../src/lib/vite/scanners/index.ts";
 
 describe("route-manifest", () => {
   test("creates a route manifest from scanned route modules", () => {
