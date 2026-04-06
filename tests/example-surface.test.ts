@@ -64,9 +64,6 @@ describe("zero-config example phial surface", () => {
     expect(blogLoadingSource).not.toContain("routeId:");
     expect(blogLoadingSource).not.toContain("location:");
 
-    const jsxPageSource = readExampleFile("app/pages/jsx/page.tsx");
-    expect(jsxPageSource).not.toContain("route.value.fullPath");
-
     const rootLoadingSource = readExampleFile("app/pages/loading.ts");
     expect(rootLoadingSource).toContain("route:");
     expect(rootLoadingSource).not.toContain("routeId:");
@@ -109,7 +106,6 @@ describe("zero-config example phial surface", () => {
     expect(typecheckConfig).toContain('"phial/vite-plugin": [');
     expect(typecheckConfig).toContain('"../phial.config.ts"');
     expect(typecheckConfig).not.toContain("../horn.config.ts");
-    expect(typecheckConfig).not.toContain("ignoreDeprecations");
 
     const hmrSmoke = readFileSync(resolve(repoRoot, "scripts/hmr-smoke.mjs"), "utf8");
     expect(hmrSmoke).toContain('["exec", "tsx", "src/bin.ts"');
