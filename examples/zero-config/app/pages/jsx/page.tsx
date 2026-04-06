@@ -20,7 +20,7 @@ export default defineComponent({
         </p>
         <ul>
           <li>
-            Current path: <strong>{route.fullPath}</strong>
+            Current path: <strong>{route.value.fullPath}</strong>
           </li>
           <li>
             Theme from app loader: <strong>{theme.value}</strong>
