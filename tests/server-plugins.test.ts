@@ -2,17 +2,9 @@ import { InvocationContext, type ServerMiddleware, type ServerMiddlewareResolver
 import { describe, expect, test, vi } from "vitest";
 import { defineComponent } from "vue";
 import type { RouteRuntimeIntegration } from "vuepagelet/integration";
-import { createAppRouteServerPlugin } from "../src/lib/app-routes/index.ts";
+import { createAppRouteMiddleware } from "../src/lib/app-routes/index.ts";
 import { toSevokServerOptions } from "../src/lib/server-routes/index.ts";
 import type { ServerRouteRecord } from "../src/lib/server-routes/types";
-
-function createMockServer() {
-  return {
-    options: {
-      middleware: [] as ServerMiddleware[],
-    },
-  };
-}
 
 function createMockContext(request: Request): InvocationContext {
   return new InvocationContext({
@@ -90,7 +82,7 @@ describe("server plugins", () => {
       ],
     });
 
-    const appPlugin = createAppRouteServerPlugin({
+    const appMiddleware = createAppRouteMiddleware({
       routes: [
         {
           id: "page",
@@ -102,12 +94,10 @@ describe("server plugins", () => {
       createIntegration: () => appIntegration,
     });
 
-    const mockServer = createMockServer();
-    appPlugin(mockServer as never);
-
     // Server routes should be checked before app routes via middleware ordering
     // For this test, we verify both can coexist
     expect(serverSetup.options.routes).toHaveProperty("/api/ping");
+    expect(typeof appMiddleware).toBe("function");
   });
 
   test("app routes plugin falls through when no route matches", async () => {
@@ -116,16 +106,13 @@ describe("server plugins", () => {
       match: vi.fn(() => null),
       handleRequest,
     } as unknown as RouteRuntimeIntegration;
-    const plugin = createAppRouteServerPlugin({
+    const middleware = createAppRouteMiddleware({
       routes: [],
       createIntegration: () => integration,
     });
-    const server = createMockServer();
-
-    plugin(server as never);
 
     const response = await runMiddlewareStack(
-      server.options.middleware,
+      [middleware],
       new Request("http://local/missing"),
       async () => new Response("next"),
     );
@@ -141,16 +128,13 @@ describe("server plugins", () => {
       match: vi.fn(() => ({ route: { id: "page" } })),
       handleRequest,
     } as unknown as RouteRuntimeIntegration;
-    const plugin = createAppRouteServerPlugin({
+    const middleware = createAppRouteMiddleware({
       routes: [],
       createIntegration: () => integration,
     });
-    const server = createMockServer();
-
-    plugin(server as never);
 
     const response = await runMiddlewareStack(
-      server.options.middleware,
+      [middleware],
       new Request("http://local/page"),
       async () => new Response("next"),
     );
@@ -220,7 +204,7 @@ describe("server plugins", () => {
   });
 
   test("app routes plugin can use the default runtime integration", async () => {
-    const plugin = createAppRouteServerPlugin({
+    const middleware = createAppRouteMiddleware({
       routes: [
         {
           id: "root",
@@ -237,17 +221,37 @@ describe("server plugins", () => {
         },
       ],
     });
-    const server = createMockServer();
-
-    plugin(server as never);
 
     const response = await runMiddlewareStack(
-      server.options.middleware,
+      [middleware],
       new Request("http://local/"),
       async () => new Response("next"),
     );
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/html");
+  });
+
+  test("toSevokServerOptions converts wildcard method handler", () => {
+    const wildcardHandler = async () => Response.json({ method: "any" });
+    const getHandler = async () => Response.json({ method: "GET" });
+
+    const routes: ServerRouteRecord[] = [
+      {
+        id: "api/wildcard",
+        path: "/api/wildcard",
+        definition: {
+          GET: getHandler,
+          "*": wildcardHandler,
+        },
+      },
+    ];
+
+    const options = toSevokServerOptions({ routes, middlewareRegistry: {} });
+
+    expect(options.routes).toHaveProperty("/api/wildcard");
+    const route = options.routes!["/api/wildcard"];
+    expect(route).toHaveProperty("GET");
+    expect(route).toHaveProperty("*");
   });
 });

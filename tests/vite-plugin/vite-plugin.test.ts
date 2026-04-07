@@ -139,7 +139,7 @@ describe("phialVitePlugin", () => {
     const appPluginModule = await callLoad(plugin, appPluginId as string);
     const serverPluginModule = await callLoad(plugin, serverPluginId as string);
 
-    expect(appPluginModule).toContain("createAppRouteServerPlugin");
+    expect(appPluginModule).toContain("createAppRouteMiddleware");
     expect(appPluginModule).toContain("export default createAppPlugin");
     expect(serverPluginModule).toContain("createServerPlugin");
     expect(serverPluginModule).toContain("return async (context, next) => {");

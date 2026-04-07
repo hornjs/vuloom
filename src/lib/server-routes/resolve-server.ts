@@ -48,7 +48,6 @@ export async function resolveServerRouteDefinition(
       definition.meta && typeof definition.meta === "object"
         ? (definition.meta as Record<string, unknown>)
         : undefined,
-    handler: asHandler(definition.handler),
     GET: asHandler(definition.GET),
     POST: asHandler(definition.POST),
     PUT: asHandler(definition.PUT),
@@ -56,6 +55,7 @@ export async function resolveServerRouteDefinition(
     DELETE: asHandler(definition.DELETE),
     HEAD: asHandler(definition.HEAD),
     OPTIONS: asHandler(definition.OPTIONS),
+    "*": asHandler(definition["*"]),
   };
 }
 

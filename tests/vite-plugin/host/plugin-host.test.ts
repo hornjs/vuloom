@@ -49,8 +49,8 @@ describe("plugin host", () => {
   });
 
   test("runtime-facing dynamic imports are annotated for vite ssr analysis", () => {
-    const appRoutesPluginSource = readFileSync(
-      resolve(import.meta.dirname, "../../../src/lib/app-routes/app-routes-plugin.ts"),
+    const appRoutesMiddlewareSource = readFileSync(
+      resolve(import.meta.dirname, "../../../src/lib/app-routes/app-routes-middleware.ts"),
       "utf8",
     );
     const serverHostSource = readFileSync(
@@ -58,7 +58,7 @@ describe("plugin host", () => {
       "utf8",
     );
 
-    expect(appRoutesPluginSource).toContain("/* @vite-ignore */");
+    expect(appRoutesMiddlewareSource).toContain("/* @vite-ignore */");
     expect(serverHostSource).toContain("/* @vite-ignore */");
   });
 

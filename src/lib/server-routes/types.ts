@@ -25,8 +25,6 @@ export type { ServerMiddleware, ServerMethodHandlers };
 export interface ServerRouteDefinition extends ServerMethodHandlers {
   middlewareNames?: readonly string[];
   meta?: Record<string, unknown>;
-  /** Fallback handler when no method-specific handler matches */
-  handler?: ServerHandler;
 }
 
 export interface ServerRouteRecord {

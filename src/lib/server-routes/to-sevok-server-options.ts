@@ -4,7 +4,7 @@ import type {
   ServerMiddleware,
   ServerMiddlewareFunction,
   ServerMiddlewareResolver,
-  ServerOptions,
+  RoutingOptions,
   ServerRoutes,
 } from "sevok";
 import type { ServerRouteRecord } from "./types";
@@ -21,7 +21,7 @@ export interface ToSevokServerOptionsOptions {
 }
 
 /**
- * Convert phial server routes to sevok ServerOptions.
+ * Convert phial server routes to sevok RoutingOptions.
  *
  * This allows phial routes to be used directly with sevok's Server,
  * leveraging sevok's built-in routing, middleware resolution, and handler invocation.
@@ -39,7 +39,7 @@ export interface ToSevokServerOptionsOptions {
  */
 export function toSevokServerOptions(
   options: ToSevokServerOptionsOptions,
-): Pick<ServerOptions, "routes" | "middleware" | "middlewareResolver" | "fetch"> {
+): Omit<RoutingOptions, "error"> {
   const { routes, middlewareRegistry, globalMiddlewareNames, fallback } = options;
 
   // Convert phial routes to sevok ServerRoutes
@@ -71,9 +71,9 @@ function convertRoutesToSevok(routes: ServerRouteRecord[]): ServerRoutes {
       ...(definition.middlewareNames ?? []),
     ];
 
-    // Build method handlers map
+    // Build method handlers map, including wildcard
     const methodHandlers: Partial<Record<string, ServerHandler>> = {};
-    const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] as const;
+    const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "*"] as const;
 
     for (const method of methods) {
       const handler = definition[method];
@@ -85,31 +85,10 @@ function convertRoutesToSevok(routes: ServerRouteRecord[]): ServerRoutes {
     const hasMethods = Object.keys(methodHandlers).length > 0;
     const hasMiddleware = routeMiddlewareNames.length > 0;
 
-    // Determine the final handler for this route
-    if (definition.handler) {
-      // Has generic handler - use as base, add method handlers as overrides
-      if (hasMethods) {
-        // Both generic and method handlers - create combined handler object
-        serverRoutes[route.path] = {
-          handle: normalizeHandler(definition.handler),
-          ...(hasMiddleware ? { middleware: routeMiddlewareNames } : {}),
-          ...methodHandlers,
-        };
-      } else if (hasMiddleware) {
-        // Only generic handler with middleware
-        serverRoutes[route.path] = {
-          handle: normalizeHandler(definition.handler),
-          middleware: routeMiddlewareNames,
-        };
-      } else {
-        // Just the generic handler
-        serverRoutes[route.path] = definition.handler;
-      }
-    } else if (hasMethods) {
-      // Only method-specific handlers
-      // Create a handler object with methods, optionally with middleware
+    // Build the route entry
+    if (hasMethods) {
       if (hasMiddleware) {
-        // Use first method handler as the base handle, others as overrides
+        // Need to wrap in handler object to attach middleware
         const firstMethod = Object.keys(methodHandlers)[0] as keyof typeof methodHandlers;
         serverRoutes[route.path] = {
           handle: normalizeHandler(methodHandlers[firstMethod]!),
@@ -117,6 +96,7 @@ function convertRoutesToSevok(routes: ServerRouteRecord[]): ServerRoutes {
           ...methodHandlers,
         };
       } else {
+        // Just method handlers, no middleware
         serverRoutes[route.path] = methodHandlers as ServerRoutes[string];
       }
     }

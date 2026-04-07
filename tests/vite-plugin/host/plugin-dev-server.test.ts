@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import {
-  createAppRouteServerPlugin,
+  createAppRouteMiddleware,
 } from "../../../src/lib/app-routes/index.ts";
 import {
   createPhialViteInlineConfig,
@@ -12,15 +12,14 @@ describe("plugin dev server", () => {
   test("creates a sevok request handler from generated server/app plugins", async () => {
     const ssrLoadModule = vi.fn(async (id: string) => {
       if (id === "phial/generated-server-plugin") {
-        // New server plugin is a sevok plugin function that applies routes directly
+        // Server plugin now returns middleware directly
         return {
-          default: () => (server: { options: { routes?: Record<string, unknown>; middleware?: unknown[] } }) => {
-            server.options.routes = {
-              ...server.options.routes,
-              "/api/ping": {
-                GET: async () => new Response("pong"),
-              },
-            };
+          default: () => async (context: any, next: any) => {
+            const url = new URL(context.request.url);
+            if (url.pathname === "/api/ping") {
+              return new Response("pong");
+            }
+            return next(context);
           },
         };
       }
@@ -28,7 +27,7 @@ describe("plugin dev server", () => {
       if (id === "phial/generated-app-plugin") {
         return {
           default: () =>
-            createAppRouteServerPlugin({
+            createAppRouteMiddleware({
               routes: [],
               createIntegration: () => ({
                 match: (pathname: string) => (pathname === "/" ? { route: { id: "page" } } : null),

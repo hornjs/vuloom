@@ -7,7 +7,7 @@ declare namespace PhialGeneratedTypes {
   type CreateRouteRuntimeIntegrationOptions =
     import("vuepagelet/integration").CreateRouteRuntimeIntegrationOptions;
   type RouteRuntimeIntegration = import("vuepagelet/integration").RouteRuntimeIntegration;
-  type SevokServerPlugin = import("sevok").ServerPlugin;
+  type ServerMiddlewareFunction = import("sevok").ServerMiddlewareFunction;
 
   interface DevConfig {
     host?: string;
@@ -141,8 +141,8 @@ declare module "phial/generated-app-plugin" {
 
   export function createAppPlugin(
     options?: PhialCreateAppPluginOptions,
-  ): PhialGeneratedTypes.SevokServerPlugin;
-  export const appPlugin: PhialGeneratedTypes.SevokServerPlugin;
+  ): PhialGeneratedTypes.ServerMiddlewareFunction;
+  export const appPlugin: PhialGeneratedTypes.ServerMiddlewareFunction;
   export default createAppPlugin;
 }
 
@@ -158,8 +158,8 @@ declare module "phial/generated-server-middleware" {
 }
 
 declare module "phial/generated-server-plugin" {
-  export function createServerPlugin(): PhialGeneratedTypes.SevokServerPlugin;
-  export const serverPlugin: PhialGeneratedTypes.SevokServerPlugin;
+  export function createServerPlugin(): PhialGeneratedTypes.ServerMiddlewareFunction;
+  export const serverPlugin: PhialGeneratedTypes.ServerMiddlewareFunction;
   export default createServerPlugin;
 }
 

@@ -166,4 +166,31 @@ describe("createServerRouteModules", () => {
       }),
     ).rejects.toThrow(/Ambiguous server routes/);
   });
+
+  test("supports wildcard method handler via '*' key", async () => {
+    const wildcardHandler = async () => ({ method: "any" });
+    const getHandler = async () => ({ method: "GET" });
+
+    const routes: ScannedServerRoutesInput = {
+      entries: [{ file: "api/wildcard.ts" }],
+    };
+    const resolver = createModuleResolver({
+      "api/wildcard.ts": {
+        default: {
+          GET: getHandler,
+          "*": wildcardHandler,
+        },
+      },
+    });
+
+    const result = await createServerRouteModules({
+      routes,
+      resolveModule: resolver.resolve,
+    });
+
+    expect(result.routes).toHaveLength(1);
+    expect(result.routes[0]?.definition.GET).toBe(getHandler);
+    expect(result.routes[0]?.definition["*"]).toBe(wildcardHandler);
+  });
+
 });

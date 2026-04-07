@@ -121,3 +121,7 @@ CLI entry: `phial/cli`
 ```ts
 import { runPhialCli } from "phial/cli";
 ```
+
+## TODO
+
+- **TypeScript 7 Migration**: Remove `baseUrl` support from generated `.phial/tsconfig.typecheck.json` when TypeScript 7 is released. Currently using `ignoreDeprecations: "6.0"` to suppress the deprecation warning.

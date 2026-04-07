@@ -1,4 +1,4 @@
-import type { ServerMiddlewareFunction, ServerPlugin } from "sevok";
+import type { ServerMiddlewareFunction } from "sevok";
 import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
 import type {
@@ -8,10 +8,10 @@ import type {
 } from "vuepagelet/integration";
 
 /**
- * Options for creating the app routes server plugin.
+ * Options for creating the app routes server middleware.
  * Aligns with vuepagelet's route runtime integration options.
  */
-export interface CreateAppRouteServerPluginOptions {
+export interface CreateAppRouteMiddlewareOptions {
   /** App-level configuration (shell, error boundary, etc.) */
   app?: AppModule;
   /** Route records to be handled by the app */
@@ -20,39 +20,35 @@ export interface CreateAppRouteServerPluginOptions {
   clientEntryPath?: string;
   /** Custom integration factory - defaults to vuepagelet's createRouteRuntimeIntegration */
   createIntegration?: (
-    options: CreateAppRouteServerPluginOptions,
+    options: CreateAppRouteMiddlewareOptions,
   ) => RouteRuntimeIntegration | Promise<RouteRuntimeIntegration>;
 }
 
 /**
- * Creates a sevok server plugin that handles app (page) routes.
+ * Creates a sevok server middleware that handles app (page) routes.
  * Integrates vuepagelet's route runtime with sevok's server.
  */
-export function createAppRouteServerPlugin(
-  options: CreateAppRouteServerPluginOptions,
-): ServerPlugin {
+export function createAppRouteMiddleware(
+  options: CreateAppRouteMiddlewareOptions,
+): ServerMiddlewareFunction {
   let integrationPromise: Promise<RouteRuntimeIntegration> | undefined;
 
-  return (server) => {
-    server.options.middleware.push(
-      createAppRouteMiddleware(options, () => {
-        if (!integrationPromise) {
-          integrationPromise = Promise.resolve(
-            options.createIntegration?.(options) ?? loadDefaultIntegration(options),
-          );
-        }
+  return createAppRouteMiddlewareHandler(options, () => {
+    if (!integrationPromise) {
+      integrationPromise = Promise.resolve(
+        options.createIntegration?.(options) ?? loadDefaultIntegration(options),
+      );
+    }
 
-        return integrationPromise;
-      }),
-    );
-  };
+    return integrationPromise;
+  });
 }
 
 /**
- * Creates middleware that routes requests to the vuepagelet integration.
+ * Creates middleware handler that routes requests to the vuepagelet integration.
  */
-function createAppRouteMiddleware(
-  _options: CreateAppRouteServerPluginOptions,
+function createAppRouteMiddlewareHandler(
+  _options: CreateAppRouteMiddlewareOptions,
   getIntegration: () => Promise<RouteRuntimeIntegration>,
 ): ServerMiddlewareFunction {
   return async (context, next) => {
@@ -72,10 +68,10 @@ function createAppRouteMiddleware(
  * Loads the default vuepagelet route runtime integration.
  */
 async function loadDefaultIntegration(
-  options: CreateAppRouteServerPluginOptions,
+  options: CreateAppRouteMiddlewareOptions,
 ): Promise<RouteRuntimeIntegration> {
   const module = (await dynamicImport()) as {
-    createRouteRuntimeIntegration: (options: CreateAppRouteServerPluginOptions) => RouteRuntimeIntegration;
+    createRouteRuntimeIntegration: (options: CreateAppRouteMiddlewareOptions) => RouteRuntimeIntegration;
   };
 
   return module.createRouteRuntimeIntegration(options);

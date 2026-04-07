@@ -4,12 +4,12 @@ export { createRouteRuntimeModules } from "./create-route-runtime-modules";
 export { resolveAppModule } from "./resolve-app";
 export { resolveRouteModules } from "./resolve-routes";
 
-// Server plugin for app routes
-export { createAppRouteServerPlugin } from "./app-routes-plugin";
+// Server middleware for app routes
+export { createAppRouteMiddleware } from "./app-routes-middleware";
 
 // Local types
 export type * from "./types";
-export type { CreateAppRouteServerPluginOptions } from "./app-routes-plugin";
+export type { CreateAppRouteMiddlewareOptions } from "./app-routes-middleware";
 
 // Re-export vuepagelet types for consumers
 // These are the core types needed when working with app routes

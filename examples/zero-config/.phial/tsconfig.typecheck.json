@@ -8,6 +8,7 @@
       "DOM.Iterable"
     ],
     "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "jsx": "preserve",
     "jsxImportSource": "vue",

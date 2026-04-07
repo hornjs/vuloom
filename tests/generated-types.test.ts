@@ -42,7 +42,7 @@ describe("generated module type surface", () => {
     expect(source).toContain("declare namespace PhialGeneratedTypes");
     expect(source).toContain("type ServerRouteHandler = import(\"sevok\").ServerHandler;");
     expect(source).toContain("type ServerMiddleware = import(\"sevok\").ServerMiddleware;");
-    expect(source).toContain("type SevokServerPlugin = import(\"sevok\").ServerPlugin;");
+    expect(source).toContain("type ServerMiddlewareFunction = import(\"sevok\").ServerMiddlewareFunction;");
     expect(source).toContain("createAppPlugin");
     expect(source).toContain("createServerPlugin");
     expect(source).not.toContain("FestServerPlugin");

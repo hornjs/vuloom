@@ -98,7 +98,7 @@ describe("virtual module generators", () => {
     expect(runtimeModule).toContain("export function createIntegration");
     expect(runtimeModule).toContain("__ROUTE_MODULE_HMR__");
     expect(runtimeModule).toContain("__APP_RUNTIME_HMR__");
-    expect(appPluginModule).toContain("createAppRouteServerPlugin");
+    expect(appPluginModule).toContain("createAppRouteMiddleware");
     expect(appPluginModule).toContain("export function createAppPlugin");
     expect(appPluginModule).toContain("createIntegration");
     expect(appPluginModule).toContain("return async (context, next) => {");

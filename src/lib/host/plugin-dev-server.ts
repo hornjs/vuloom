@@ -203,11 +203,11 @@ async function handleRequest(
 }
 
 interface DevAppPluginModule {
-  default?: (options?: { clientEntryPath?: string }) => (server: unknown) => void;
+  default?: (options?: { clientEntryPath?: string }) => (context: unknown, next: unknown) => Promise<Response>;
 }
 
 interface DevServerPluginModule {
-  default?: () => (server: unknown) => void;
+  default?: () => (context: unknown, next: unknown) => Promise<Response>;
 }
 
 export async function createDevRequestHandler(
@@ -223,14 +223,16 @@ export async function createDevRequestHandler(
     `${PHIAL_RUNTIME_PACKAGE_ID}/generated-server-plugin`,
   )) as DevServerPluginModule | undefined;
 
+  const middleware = [
+    serverPluginModule?.default?.(),
+    appPluginModule?.default?.({
+      clientEntryPath: options.clientEntryPath,
+    }),
+  ].filter((m): m is NonNullable<typeof m> => m !== undefined);
+
   return createSevokServer({
     manual: true,
-    plugins: [
-      serverPluginModule?.default?.() ?? (() => {}),
-      appPluginModule?.default?.({
-        clientEntryPath: options.clientEntryPath,
-      }) ?? (() => {}),
-    ],
+    middleware,
     fetch: createNotFoundResponse,
   });
 }
