@@ -33,7 +33,7 @@ export interface ScannedServerRoute {
   id: string;
   file: string;
   absoluteFile: string;
-  directoryMiddleware: string[];
+  middleware: string[];
   path: string;
 }
 

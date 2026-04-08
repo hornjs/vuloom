@@ -51,7 +51,7 @@ describe("scanner-utils", () => {
         id: "server/posts/:id",
         file: "server/routes/posts/[id].ts",
         absoluteFile: "/server/routes/posts/[id].ts",
-        directoryMiddleware: [],
+        middleware: [],
         path: "/posts/:id",
       },
     ];

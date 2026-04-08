@@ -43,7 +43,7 @@ export async function resolveServerRouteDefinition(
   const definition = route as Record<string, unknown>;
 
   return {
-    middlewareNames: normalizeMiddlewareNames(definition.middleware),
+    middleware: normalizeMiddleware(definition.middleware),
     meta:
       definition.meta && typeof definition.meta === "object"
         ? (definition.meta as Record<string, unknown>)
@@ -59,10 +59,10 @@ export async function resolveServerRouteDefinition(
   };
 }
 
-export async function resolveDirectoryMiddlewareNames(
+export async function resolveServerRouteMiddleware(
   file: string,
   resolveModule: ModuleResolver["resolve"],
-): Promise<string[]> {
+): Promise<ServerMiddleware[]> {
   const module = await resolveModule(file);
   const middleware =
     typeof module === "object" && module
@@ -74,13 +74,16 @@ export async function resolveDirectoryMiddlewareNames(
     return [];
   }
 
-  if (!Array.isArray(middleware) || middleware.some((name) => typeof name !== "string")) {
+  if (
+    !Array.isArray(middleware) ||
+    middleware.some((entry) => typeof entry !== "string" && typeof entry !== "function")
+  ) {
     throw new Error(
-      `Invalid server route directory middleware "${file}". Expected a default export or named "middleware" export with a string array.`,
+      `Invalid server route middleware "${file}". Expected a default export or named "middleware" export with an array of middleware names and/or functions.`,
     );
   }
 
-  return [...middleware];
+  return [...middleware] as ServerMiddleware[];
 }
 
 async function resolveServerMiddleware(
@@ -101,16 +104,19 @@ async function resolveServerMiddleware(
   return middleware as ServerMiddleware;
 }
 
-function normalizeMiddlewareNames(value: unknown): string[] | undefined {
+function normalizeMiddleware(value: unknown): ServerMiddleware[] | undefined {
   if (value === undefined) {
     return undefined;
   }
 
-  if (!Array.isArray(value) || value.some((name) => typeof name !== "string")) {
-    throw new Error('Server route "middleware" must be a string array.');
+  if (
+    !Array.isArray(value) ||
+    value.some((entry) => typeof entry !== "string" && typeof entry !== "function")
+  ) {
+    throw new Error('Server route "middleware" must be an array of middleware names and/or functions.');
   }
 
-  return [...value];
+  return [...value] as ServerMiddleware[];
 }
 
 function asHandler(value: unknown): ServerRouteHandler | undefined {

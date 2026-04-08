@@ -34,7 +34,7 @@ describe("scanRoutes", () => {
       "app/error.vue": "<template><div /></template>",
       "app/loader.ts": "export default async function loader() {}",
       "app/pages/layout.vue": "<template><div /></template>",
-      "app/pages/page.vue": "<template><div /></template>",
+      "app/pages/index/page.vue": "<template><div /></template>",
       "app/pages/posts/layout.vue": "<template><div /></template>",
       "app/pages/posts/[slug]/page.vue": "<template><div /></template>",
       "server/routes/api/ping.ts": "export default {}",
@@ -66,7 +66,7 @@ describe("scanRoutes", () => {
     expect(result.server.routes).toEqual([
       {
         absoluteFile: `${root}/server/routes/api/ping.ts`,
-        directoryMiddleware: [],
+        middleware: [],
         file: "server/routes/api/ping.ts",
         id: "api/ping",
         path: "/api/ping",

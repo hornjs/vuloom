@@ -3,7 +3,7 @@ import type { ModuleResolver } from "../app-routes/types";
 export type { ModuleResolver };
 import type { ServerHandler, ServerMethodHandlers, ServerMiddleware } from "sevok";
 
-export type ServerRouteEntryKind = "route" | "directory-middleware";
+export type ServerRouteEntryKind = "route" | "middleware";
 
 export interface ScannedServerRouteEntry {
   file: string;
@@ -23,7 +23,7 @@ export type { ServerMiddleware, ServerMethodHandlers };
 
 // Extend sevok's ServerMethodHandlers to add phial-specific fields
 export interface ServerRouteDefinition extends ServerMethodHandlers {
-  middlewareNames?: readonly string[];
+  middleware?: readonly ServerMiddleware[];
   meta?: Record<string, unknown>;
 }
 
@@ -31,7 +31,7 @@ export interface ServerRouteRecord {
   id: string;
   path: string;
   file?: string;
-  directoryMiddlewareNames?: readonly string[];
+  middleware?: readonly ServerMiddleware[];
   definition: ServerRouteDefinition;
 }
 

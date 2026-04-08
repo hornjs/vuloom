@@ -1,7 +1,7 @@
 export { buildServerRouteTree } from "./build-tree";
 export { createServerRouteModules } from "./create-server-route-modules";
 export {
-  resolveDirectoryMiddlewareNames,
+  resolveServerRouteMiddleware,
   resolveServerMiddlewareRegistry,
   resolveServerRouteDefinition,
 } from "./resolve-server";

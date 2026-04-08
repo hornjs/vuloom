@@ -28,6 +28,14 @@ describe("createServerRouteModules", () => {
       context: { request: Request },
       next: (context: { request: Request }) => Promise<Response>,
     ) => next(context);
+    const inlineScopeMiddleware = async (
+      context: { request: Request },
+      next: (context: { request: Request }) => Promise<Response>,
+    ) => next(context);
+    const inlineRouteMiddleware = async (
+      context: { request: Request },
+      next: (context: { request: Request }) => Promise<Response>,
+    ) => next(context);
     const getHandler = async () => ({ ok: true });
     const postHandler = async () => ({ created: true });
     const robotsHandler = () => new Response("ok");
@@ -44,10 +52,10 @@ describe("createServerRouteModules", () => {
     const resolver = createModuleResolver({
       "middleware/server-trace.ts": { default: globalMiddleware },
       "middleware/server-trace-scope.ts": { default: scopeMiddleware },
-      "api/_middleware.ts": { default: ["server-trace-scope"] },
+      "api/_middleware.ts": { default: ["server-trace-scope", inlineScopeMiddleware] },
       "api/ping.ts": {
         default: {
-          middleware: ["server-trace"],
+          middleware: ["server-trace", inlineRouteMiddleware],
           meta: {
             kind: "api",
           },
@@ -79,9 +87,9 @@ describe("createServerRouteModules", () => {
       id: "api/ping",
       path: "/api/ping",
       file: "api/ping.ts",
-      directoryMiddlewareNames: ["server-trace-scope"],
+      middleware: ["server-trace-scope", inlineScopeMiddleware],
       definition: {
-        middlewareNames: ["server-trace"],
+        middleware: ["server-trace", inlineRouteMiddleware],
         meta: {
           kind: "api",
         },
@@ -94,7 +102,7 @@ describe("createServerRouteModules", () => {
       id: "robots.txt",
       path: "/robots.txt",
       file: "robots.txt.ts",
-      directoryMiddlewareNames: [],
+      middleware: [],
       definition: {},
     });
     expect(result.routes[1]?.definition.GET).toBe(robotsHandler);
@@ -119,7 +127,7 @@ describe("createServerRouteModules", () => {
     );
   });
 
-  test("rejects invalid server route directory middleware exports", async () => {
+  test("rejects invalid server route middleware exports", async () => {
     const routes: ScannedServerRoutesInput = {
       entries: [{ file: "api/_middleware.ts" }, { file: "api/ping.ts" }],
     };
@@ -139,7 +147,7 @@ describe("createServerRouteModules", () => {
         }).resolve,
       }),
     ).rejects.toThrow(
-      'Invalid server route directory middleware "api/_middleware.ts". Expected a default export or named "middleware" export with a string array.',
+      'Invalid server route middleware "api/_middleware.ts". Expected a default export or named "middleware" export with an array of middleware names and/or functions.',
     );
   });
 

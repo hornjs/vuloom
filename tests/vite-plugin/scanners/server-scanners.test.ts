@@ -47,14 +47,14 @@ describe("server scanners", () => {
     expect(result).toEqual([
       {
         absoluteFile: `${root}/server/routes/api/ping.ts`,
-        directoryMiddleware: ["server/routes/api/_middleware.ts"],
+        middleware: ["server/routes/api/_middleware.ts"],
         file: "server/routes/api/ping.ts",
         id: "api/ping",
         path: "/api/ping",
       },
       {
         absoluteFile: `${root}/server/routes/robots.txt.ts`,
-        directoryMiddleware: [],
+        middleware: [],
         file: "server/routes/robots.txt.ts",
         id: "robots.txt",
         path: "/robots.txt",

@@ -38,7 +38,7 @@ const scannedResult: ScannedRoutesResult = {
         id: "robots.txt",
         file: "server/routes/robots.txt.ts",
         absoluteFile: "/repo/server/routes/robots.txt.ts",
-        directoryMiddleware: [],
+        middleware: [],
         path: "/robots.txt",
       },
     ],
@@ -139,10 +139,10 @@ describe("virtual module generators", () => {
   test("generates server routes in the shape expected by the sevok server plugin", () => {
     const serverRoutesModule = createVirtualServerRoutesModule(scannedResult);
 
-    expect(serverRoutesModule).toContain("directoryMiddlewareNames");
+    expect(serverRoutesModule).toContain("middleware");
     expect(serverRoutesModule).toContain("definition");
     expect(serverRoutesModule).toContain(
-      "middlewareNames: normalizeMiddlewareNames(route?.middleware)",
+      "middleware: normalizeMiddleware(route?.middleware)",
     );
     expect(serverRoutesModule).toContain('meta: route?.meta && typeof route.meta === "object"');
     expect(serverRoutesModule).not.toContain('"route",');

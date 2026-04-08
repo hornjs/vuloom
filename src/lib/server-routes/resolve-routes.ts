@@ -1,6 +1,6 @@
 import type { RouteNode, RouteTree } from "fs-route-ir";
 import type { ModuleResolver } from "../app-routes/types";
-import { resolveDirectoryMiddlewareNames, resolveServerRouteDefinition } from "./resolve-server";
+import { resolveServerRouteMiddleware, resolveServerRouteDefinition } from "./resolve-server";
 import type { ServerMiddleware, ServerRouteEntryKind, ServerRouteRecord } from "./types";
 
 export async function resolveServerRouteRecords(options: {
@@ -20,21 +20,21 @@ export async function resolveServerRouteRecords(options: {
 
   async function visit(
     node: RouteNode<unknown, ServerRouteEntryKind>,
-    inheritedDirectoryMiddleware: string[],
+    inheritedMiddleware: ServerMiddleware[],
   ): Promise<void> {
     if (isDirectoryContainerNode(node)) {
-      const localDirectoryMiddleware = await collectDirectoryMiddlewareEntries(
+      const localMiddleware = await collectMiddlewareEntries(
         node,
         options.resolveModule,
         options.middlewareRegistry,
       );
-      const nextDirectoryMiddleware =
-        localDirectoryMiddleware.length > 0
-          ? [...inheritedDirectoryMiddleware, ...localDirectoryMiddleware]
-          : inheritedDirectoryMiddleware;
+      const nextMiddleware =
+        localMiddleware.length > 0
+          ? [...inheritedMiddleware, ...localMiddleware]
+          : inheritedMiddleware;
 
       for (const child of node.children) {
-        await visit(child, nextDirectoryMiddleware);
+        await visit(child, nextMiddleware);
       }
 
       return;
@@ -49,32 +49,36 @@ export async function resolveServerRouteRecords(options: {
       id: node.id,
       path: node.pattern,
       file: routeFile,
-      directoryMiddlewareNames: inheritedDirectoryMiddleware,
+      middleware: inheritedMiddleware,
       definition: await resolveServerRouteDefinition(routeFile, options.resolveModule),
     });
   }
 }
 
-async function collectDirectoryMiddlewareEntries(
+async function collectMiddlewareEntries(
   node: RouteNode<unknown, ServerRouteEntryKind>,
   resolveModule: ModuleResolver["resolve"],
   middlewareRegistry: Record<string, ServerMiddleware>,
-): Promise<string[]> {
-  const file = collectSingleEntryFile(node, "directory-middleware");
+): Promise<ServerMiddleware[]> {
+  const file = collectSingleEntryFile(node, "middleware");
   if (!file) {
     return [];
   }
 
-  const middlewareNames = await resolveDirectoryMiddlewareNames(file, resolveModule);
-  for (const name of middlewareNames) {
-    if (!middlewareRegistry[name]) {
+  const middleware = await resolveServerRouteMiddleware(file, resolveModule);
+  for (const entry of middleware) {
+    if (typeof entry !== "string") {
+      continue;
+    }
+
+    if (!middlewareRegistry[entry]) {
       throw new Error(
-        `Unknown server middleware "${name}" referenced from ${file}. Register it in server middleware input first.`,
+        `Unknown server middleware "${entry}" referenced from ${file}. Register it in server middleware input first.`,
       );
     }
   }
 
-  return middlewareNames;
+  return middleware;
 }
 
 function collectSingleEntryFile(

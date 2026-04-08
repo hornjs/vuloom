@@ -60,7 +60,7 @@ declare namespace PhialGeneratedTypes {
 
   // Extend sevok's ServerMethodHandlers to add phial-specific fields
   interface ServerRouteDefinition extends ServerMethodHandlers {
-    middlewareNames?: readonly string[];
+    middleware?: readonly import("sevok").ServerMiddleware[];
     meta?: Record<string, unknown>;
     /** Fallback handler when no method-specific handler matches */
     handler?: ServerRouteHandler;
@@ -70,7 +70,7 @@ declare namespace PhialGeneratedTypes {
     id: string;
     path: string;
     file?: string;
-    directoryMiddlewareNames?: readonly string[];
+    middleware?: readonly import("sevok").ServerMiddleware[];
     definition: ServerRouteDefinition;
   }
 }

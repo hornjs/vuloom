@@ -63,12 +63,12 @@ function convertRoutesToSevok(routes: ServerRouteRecord[]): ServerRoutes {
   const serverRoutes: ServerRoutes = {};
 
   for (const route of routes) {
-    const { definition, directoryMiddlewareNames } = route;
+    const { definition, middleware } = route;
 
-    // Collect route-level middleware (directory + route-specific)
-    const routeMiddlewareNames: string[] = [
-      ...(directoryMiddlewareNames ?? []),
-      ...(definition.middlewareNames ?? []),
+    // Collect route-level middleware (inherited + route-specific)
+    const routeMiddleware: ServerMiddleware[] = [
+      ...(middleware ?? []),
+      ...(definition.middleware ?? []),
     ];
 
     // Build method handlers map, including wildcard
@@ -83,7 +83,7 @@ function convertRoutesToSevok(routes: ServerRouteRecord[]): ServerRoutes {
     }
 
     const hasMethods = Object.keys(methodHandlers).length > 0;
-    const hasMiddleware = routeMiddlewareNames.length > 0;
+    const hasMiddleware = routeMiddleware.length > 0;
 
     // Build the route entry
     if (hasMethods) {
@@ -92,7 +92,7 @@ function convertRoutesToSevok(routes: ServerRouteRecord[]): ServerRoutes {
         const firstMethod = Object.keys(methodHandlers)[0] as keyof typeof methodHandlers;
         serverRoutes[route.path] = {
           handle: normalizeHandler(methodHandlers[firstMethod]!),
-          middleware: routeMiddlewareNames,
+          middleware: routeMiddleware,
           ...methodHandlers,
         };
       } else {

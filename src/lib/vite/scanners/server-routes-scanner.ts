@@ -43,10 +43,10 @@ export async function scanServerRoutes(options: {
             return null;
           }
 
-          return {
-            kind: "directory-middleware" as const,
-            scope: "directory" as const,
-          };
+        return {
+          kind: "middleware" as const,
+          scope: "directory" as const,
+        };
         }
 
         return {
@@ -115,17 +115,17 @@ function collectServerRoutes(
 
   function visit(
     node: RouteNode<unknown, ServerEntryKind>,
-    inheritedDirectoryMiddleware: string[],
+    inheritedMiddleware: string[],
   ): void {
     if (isDirectoryContainerNode(node)) {
-      const localDirectoryMiddleware = collectDirectoryMiddlewareEntries(node, options);
-      const nextDirectoryMiddleware =
-        localDirectoryMiddleware.length > 0
-          ? [...inheritedDirectoryMiddleware, ...localDirectoryMiddleware]
-          : inheritedDirectoryMiddleware;
+      const localMiddleware = collectMiddlewareEntries(node, options);
+      const nextMiddleware =
+        localMiddleware.length > 0
+          ? [...inheritedMiddleware, ...localMiddleware]
+          : inheritedMiddleware;
 
       for (const child of node.children) {
-        visit(child, nextDirectoryMiddleware);
+        visit(child, nextMiddleware);
       }
 
       return;
@@ -144,13 +144,13 @@ function collectServerRoutes(
       id: node.id,
       file: toRootRelativeRouteFile(options.root, options.routesDir, routeFile),
       absoluteFile: toPosixPath(resolve(options.routesDir, routeFile)),
-      directoryMiddleware: inheritedDirectoryMiddleware,
+      middleware: inheritedMiddleware,
       path: node.pattern,
     });
   }
 }
 
-function collectDirectoryMiddlewareEntries(
+function collectMiddlewareEntries(
   node: RouteNode<unknown, ServerEntryKind>,
   options: {
     root: string;
@@ -158,7 +158,7 @@ function collectDirectoryMiddlewareEntries(
   },
 ): string[] {
   const file = resolveSingleEntryFile(
-    collectEntryFiles(node.entries, "directory-middleware"),
+    collectEntryFiles(node.entries, "middleware"),
     node.dir,
     DIRECTORY_MIDDLEWARE_BASENAME,
   );

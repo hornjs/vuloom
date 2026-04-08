@@ -25,7 +25,7 @@ export function buildServerRouteTree(
 
         if (baseName === "_middleware") {
           return {
-            kind: "directory-middleware",
+            kind: "middleware",
             scope: "directory",
           };
         }
