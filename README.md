@@ -13,11 +13,11 @@ pnpm add phial
 ### Vite Config (`vite.config.ts`)
 
 ```ts
-import { phialVitePlugin } from "phial/vite";
+import { phial } from "phial/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [phialVitePlugin()],
+  plugins: [phial()],
 });
 ```
 

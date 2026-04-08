@@ -33,10 +33,10 @@ import {
   resolveVirtualModuleId,
 } from "./generated/virtual-modules";
 
-export interface PhialVitePluginOptions extends PhialPluginOptions {}
+export interface PhialOptions extends PhialPluginOptions {}
 export const DEFAULT_CLIENT_ENTRY_PUBLIC_PATH = "/@phial/client-entry.js";
 
-export function phialVitePlugin(options: PhialVitePluginOptions = {}): Plugin {
+export function phial(options: PhialOptions = {}): Plugin {
   let viteConfig: ResolvedConfig | null = null;
   let scannedRoutesPromise: Promise<ScannedRoutesResult> | null = null;
   let phialConfigPromise: Promise<LoadedPhialConfig> | null = null;
@@ -258,7 +258,7 @@ export function phialVitePlugin(options: PhialVitePluginOptions = {}): Plugin {
     return phialConfigPromise;
   }
 
-  async function getResolvedOptions(): Promise<PhialVitePluginOptions> {
+  async function getResolvedOptions(): Promise<PhialOptions> {
     const phialConfig = await getPhialConfig();
     const configuredOptions = phialConfig.config.plugin ?? {};
     const appDir = options.appDir ?? configuredOptions.appDir ?? "app";

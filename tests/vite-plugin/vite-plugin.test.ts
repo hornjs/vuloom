@@ -13,7 +13,7 @@ import {
   GENERATED_SERVER_PLUGIN_ID,
   resolveVirtualModuleId,
 } from "../../src/lib/vite/generated/virtual-modules.ts";
-import { phialVitePlugin } from "../../src/vite.ts";
+import { phial } from "../../src/vite.ts";
 
 const tempRoots: string[] = [];
 
@@ -62,7 +62,7 @@ afterEach(async () => {
   }
 });
 
-describe("phialVitePlugin", () => {
+describe("phial", () => {
   test("prefers phial config files and ignores horn config filenames", async () => {
     const root = await createTempRoot();
     await writeFiles(root, {
@@ -96,7 +96,7 @@ describe("phialVitePlugin", () => {
       "server/routes/ping.ts": "export default { GET() { return new Response('pong') } }",
     });
 
-    const plugin = phialVitePlugin({
+    const plugin = phial({
       root,
       extensions: [".vue", ".ts"],
     });
@@ -157,7 +157,7 @@ describe("phialVitePlugin", () => {
         "import { defineComponent, h } from 'vue'; export default defineComponent({ setup(){ return () => h('div', null, 'home') } });",
     });
 
-    const plugin = phialVitePlugin({
+    const plugin = phial({
       root,
       extensions: [".vue", ".ts"],
     });

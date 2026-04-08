@@ -21,7 +21,7 @@ import {
   type ViteDevServer,
 } from "vite";
 import { loadPhialConfig, type PhialConfig, type LoadPhialConfigOptions } from "../config/index.ts";
-import { DEFAULT_CLIENT_ENTRY_PUBLIC_PATH, phialVitePlugin } from "../vite";
+import { DEFAULT_CLIENT_ENTRY_PUBLIC_PATH, phial } from "../vite";
 
 export interface PhialDevServerOptions extends LoadPhialConfigOptions {
   host?: string;
@@ -107,7 +107,7 @@ export function createPhialViteInlineConfig(
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
   };
-  const routesPlugin = phialVitePlugin({
+  const routesPlugin = phial({
     ...config.plugin,
     root: config.plugin?.root ?? root,
   });

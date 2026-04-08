@@ -11,7 +11,7 @@ import {
 } from "vite";
 import { loadPhialConfig, type PhialConfig, type LoadPhialConfigOptions } from "../config";
 import { createClientEntryModule } from "../vite/generated/client-entry";
-import { phialVitePlugin } from "../vite";
+import { phial } from "../vite";
 
 const PHIAL_BUILD_CLIENT_ENTRY_ID = "virtual:phial-client-entry";
 const RESOLVED_PHIAL_BUILD_CLIENT_ENTRY_ID = "\0virtual:phial-client-entry";
@@ -105,7 +105,7 @@ function createPhialClientBuildConfig(
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
   };
-  const routesPlugin = phialVitePlugin({
+  const routesPlugin = phial({
     ...config.plugin,
     root: config.plugin?.root ?? root,
   });
@@ -145,7 +145,7 @@ async function createPhialServerBuildConfig(
   root: string,
   options: Pick<PhialBuildOptions, "watch" | "logLevel">,
 ): Promise<InlineConfig> {
-  const routesPlugin = phialVitePlugin({
+  const routesPlugin = phial({
     ...config.plugin,
     root: config.plugin?.root ?? root,
   });

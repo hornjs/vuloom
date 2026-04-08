@@ -99,7 +99,8 @@ describe("phial public entry surface", () => {
     expect(indexDist).not.toHaveProperty("runHornCli");
     expect(indexTypes).toContain('export {');
 
-    expect(vitePluginDist).toHaveProperty("phialVitePlugin");
+    expect(vitePluginDist).toHaveProperty("phial");
+    expect(vitePluginDist).not.toHaveProperty("phialVitePlugin");
     expect(vitePluginDist).not.toHaveProperty("DEFAULT_CLIENT_BUILD_OUT_DIR");
     expect(vitePluginDist).not.toHaveProperty("DEFAULT_SERVER_BUILD_OUT_DIR");
     expect(vitePluginDist).not.toHaveProperty("loadHornConfig");
@@ -120,7 +121,8 @@ describe("phial public entry surface", () => {
     expect(serverTypes).toContain("ServerMiddleware");
     expect(serverTypes).toContain("InvocationContext");
 
-    expect(vitePluginTypes).toContain("PhialVitePluginOptions");
+    expect(vitePluginTypes).toContain("PhialOptions");
+    expect(vitePluginTypes).not.toContain("PhialVitePluginOptions");
     expect(vitePluginTypes).not.toContain("loadHornConfig as loadHornConfig");
     expect(vitePluginTypes).not.toContain("buildHornApp as buildHornApp");
     expect(vitePluginTypes).not.toContain("prepareHornApp as prepareHornApp");
