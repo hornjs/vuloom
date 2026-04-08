@@ -111,6 +111,8 @@ describe("zero-config example phial surface", () => {
     expect(hmrSmoke).toContain('["exec", "tsx", "src/bin.ts"');
     expect(hmrSmoke).toContain("__phialHmrProbeLoads");
     expect(hmrSmoke).toContain("phial dev server:");
+    expect(hmrSmoke).toContain("examples/zero-config/app/pages/index/page.ts");
+    expect(hmrSmoke).not.toContain("examples/zero-config/app/pages/page.ts");
     expect(hmrSmoke).not.toContain("bin/horn.mjs");
     expect(hmrSmoke).not.toContain("__hornHmrProbeLoads");
 

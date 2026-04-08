@@ -46,7 +46,7 @@ async function main() {
 
     await runProbe(page, {
       name: "route page",
-      file: "examples/zero-config/app/pages/page.ts",
+      file: "examples/zero-config/app/pages/index/page.ts",
       patch(source) {
         return source.replace(
           'h("h1", null, "Vue h() example")',
