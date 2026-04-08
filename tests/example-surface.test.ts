@@ -29,7 +29,7 @@ describe("zero-config example phial surface", () => {
     expect(existsSync(phialRouteTypesPath)).toBe(true);
     expect(existsSync(hornRouteTypesPath)).toBe(false);
 
-    expect(readFileSync(phialConfigPath, "utf8")).toContain('from "phial/vite-plugin"');
+    expect(readFileSync(phialConfigPath, "utf8")).toContain('from "phial/vite"');
 
     const readme = readExampleFile("README.md");
     expect(readme).toContain("`phial` app");
@@ -103,7 +103,7 @@ describe("zero-config example phial surface", () => {
 
     const typecheckConfig = readFileSync(phialTypecheckConfigPath, "utf8");
     expect(typecheckConfig).toContain('"phial": [');
-    expect(typecheckConfig).toContain('"phial/vite-plugin": [');
+    expect(typecheckConfig).toContain('"phial/vite": [');
     expect(typecheckConfig).toContain('"../phial.config.ts"');
     expect(typecheckConfig).not.toContain("../horn.config.ts");
 

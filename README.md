@@ -13,7 +13,7 @@ pnpm add phial
 ### Vite Config (`vite.config.ts`)
 
 ```ts
-import { phialVitePlugin } from "phial/vite-plugin";
+import { phialVitePlugin } from "phial/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -24,7 +24,7 @@ export default defineConfig({
 ### Phial Config (`phial.config.ts`)
 
 ```ts
-import { defineConfig } from "phial/vite-plugin";
+import { defineConfig } from "phial/vite";
 
 // Static config
 export default defineConfig({
@@ -66,12 +66,12 @@ export default defineConfig(async ({ mode }) => {
 ## Public entry points
 
 - `phial`
-- `phial/vite-plugin`
+- `phial/vite`
 - `phial/app`
 - `phial/server`
 
 `phial` exports the package version.  
-`phial/vite-plugin` provides the Vite plugin, config utilities, and build tools.  
+`phial/vite` provides the Vite plugin, config utilities, and build tools.  
 `phial/app` is for **app routes** — Vue pages, loaders, actions.  
 `phial/server` is for **server routes** — API handlers, middleware.
 

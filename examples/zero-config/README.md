@@ -37,7 +37,7 @@ pnpm example:zero-config
 
 Then open `http://localhost:3000`.
 
-The example imports `phial` by package name, so building first ensures `dist/` is available inside this repository checkout. The CLI then starts Vite, loads `phial` and `phial/vite-plugin` through Phial-owned generated virtual modules, and injects the default client runtime for you.
+The example imports `phial` by package name, so building first ensures `dist/` is available inside this repository checkout. The CLI then starts Vite, loads `phial` and `phial/vite` through Phial-owned generated virtual modules, and injects the default client runtime for you.
 
 For a production asset build from the package root:
 

@@ -27,8 +27,8 @@
       "phial": [
         "../../../dist/index.d.ts"
       ],
-      "phial/vite-plugin": [
-        "../../../dist/vite-plugin.d.ts"
+      "phial/vite": [
+        "../../../dist/vite.d.ts"
       ],
       "@hornjs/fest": [
         "../../../../../node_modules/@hornjs/fest/dist/index.d.mts"

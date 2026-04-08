@@ -25,7 +25,7 @@
     ".": "./src/index.ts",
     "./app": "./src/app.ts",
     "./server": "./src/server.ts",
-    "./vite-plugin": "./src/vite.ts",
+    "./vite": "./src/vite.ts",
     "./generated-routes-manifest": "./src/lib/generated-routes.d.ts",
     "./generated-routes-modules": "./src/lib/generated-routes.d.ts",
     "./generated-app-runtime": "./src/lib/generated-routes.d.ts",

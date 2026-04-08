@@ -37,7 +37,7 @@ describe("phial public entry surface", () => {
     expect(sourceBin).toContain("process.exitCode = await runPhialCli(process.argv.slice(2));");
     expect(packageJsonData.exports).toMatchObject({
       ".": "./src/index.ts",
-      "./vite-plugin": "./src/vite.ts",
+      "./vite": "./src/vite.ts",
     });
     const exports = packageJsonData.exports!;
     expect(typeof exports["./generated-routes-manifest"]).toBe("string");
@@ -187,7 +187,7 @@ describe("phial public entry surface", () => {
     expect(extractTopLevelTitle(readme)).toBe("phial");
     expect(extractPublicEntryPoints(readme)).toEqual([
       "phial",
-      "phial/vite-plugin",
+      "phial/vite",
       "phial/app",
       "phial/server",
     ]);
@@ -195,7 +195,7 @@ describe("phial public entry surface", () => {
       "phial exports the package version",
     );
     expect(extractSectionParagraph(readme, "Public entry points")).toContain(
-      "phial/vite-plugin provides the Vite plugin, config utilities, and build tools",
+      "phial/vite provides the Vite plugin, config utilities, and build tools",
     );
   }, 20_000);
 });
