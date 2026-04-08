@@ -1,8 +1,8 @@
 # Zero-Config Example
 
-This example shows the current smallest working `phial` app with file routes, no manual route registration, `phial.config.ts` as the only bootstrap declaration, `app/loader.ts` shell data, `app/app.config.ts` named middleware registration, directory-scoped `_middleware.ts`, route loading boundaries, a page `action`, and `server/routes` HTTP handlers with global and directory-scoped server middleware.
+This example shows the current smallest working `phial` app with file routes, no manual route registration, `phial.config.ts` as the only bootstrap declaration, `app/loader.ts` shell data, `app/app.config.ts` named middleware registration, directory-scoped `middleware.ts`, route loading boundaries, a page `action`, and `server/routes` HTTP handlers with global and directory-scoped server middleware.
 
-`app/app.vue` is the full document shell (`html/head/body`), and the default client runtime hydrates that document shell automatically. `app/loader.ts` provides shell-level server data for `useAppData()`, while `app/app.config.ts` registers app-level middleware by name. `app/pages/layout.ts` handles the route layout, `loading.ts` files render during client navigation, the home page demonstrates a progressively enhanced `POST` form with `useSubmit()`, and server routes execute as `sevok` invocation contexts so handlers can call `ctx.request`, `ctx.get(...)`, or `ctx.waitUntil(...)`.
+`app/app.vue` is the full document shell (`html/head/body`), and the default client runtime hydrates that document shell automatically. `app/loader.ts` provides shell-level server data for `useAppData()`, while `app/app.config.ts` registers app-level middleware by name. `app/pages/layout.ts` handles the route layout, `app/pages/index/loading.ts` renders during client navigation for the home route, the home page demonstrates a progressively enhanced `POST` form with `useSubmit()`, and server routes execute as `sevok` invocation contexts so handlers can call `ctx.request`, `ctx.get(...)`, or `ctx.waitUntil(...)`.
 
 ## Files
 
@@ -12,11 +12,11 @@ This example shows the current smallest working `phial` app with file routes, no
 - `app/app.vue`: document shell with `useAppData()` and static document metadata
 - `app/error.vue`: app-level error fallback
 - `app/pages/layout.ts`: root route layout with shared navigation
-- `app/pages/page.ts`: home page component
-- `app/pages/loader.ts`: home page loader
-- `app/pages/loading.ts`: root loading boundary for client navigation
-- `app/pages/action.ts`: home page action
-- `app/pages/blog/_middleware.ts`: directory-scoped blog route middleware declaration by name
+- `app/pages/index/page.ts`: home page component
+- `app/pages/index/loader.ts`: home page loader
+- `app/pages/index/loading.ts`: home page loading boundary for client navigation
+- `app/pages/index/action.ts`: home page action
+- `app/pages/blog/middleware.ts`: directory-scoped blog route middleware declaration by name
 - `app/pages/blog/[slug]/middleware.ts`: route middleware declaration by name
 - `app/pages/blog/[slug]/page.ts`: dynamic route component using `useLoaderData()` and `useRoute()`
 - `app/pages/blog/[slug]/loader.ts`: dynamic route loader

@@ -65,9 +65,9 @@ describe("createRouteRuntimeModules", () => {
     const routes: ScannedAppRoutesInput = {
       entries: [
         { file: "layout.vue" },
-        { file: "page.vue" },
+        { file: "index/page.vue" },
         { file: "posts/layout.vue" },
-        { file: "posts/_middleware.ts" },
+        { file: "posts/middleware.ts" },
         { file: "posts/[slug]/page.vue" },
         { file: "posts/[slug]/loader.ts" },
         { file: "posts/[slug]/action.ts" },
@@ -83,9 +83,9 @@ describe("createRouteRuntimeModules", () => {
       "middleware/trace.ts": { default: traceMiddleware },
       "middleware/auth.ts": { default: authMiddleware },
       "layout.vue": { default: rootLayout },
-      "page.vue": { default: homePage },
+      "index/page.vue": { default: homePage },
       "posts/layout.vue": { default: postsLayout },
-      "posts/_middleware.ts": { default: ["trace"] },
+      "posts/middleware.ts": { default: ["trace"] },
       "posts/[slug]/page.vue": { default: postPage },
       "posts/[slug]/loader.ts": { loader: postLoader },
       "posts/[slug]/action.ts": { action: postAction },
@@ -116,7 +116,7 @@ describe("createRouteRuntimeModules", () => {
     expect(result.routes[0]?.module.layout).toBe(rootLayout);
 
     const homeRoute = asRoute(result.routes, "page");
-    expect(homeRoute.path).toBe("");
+    expect(homeRoute.path).toBe("/");
     expect(homeRoute.module.component).toBe(homePage);
 
     const postsRoute = asRoute(result.routes, "posts/layout");
@@ -164,6 +164,64 @@ describe("createRouteRuntimeModules", () => {
       }),
     ).rejects.toThrow(
       'Route directory "posts" contains loader.ts but is missing page.vue or layout.vue.',
+    );
+  });
+
+  test("normalizes index route directories to their parent path", async () => {
+    const usersPage = { name: "UsersPage" };
+    const userPage = { name: "UserPage" };
+    const indexLoader = async () => ({ users: true });
+    const treeMiddleware = async (_context: unknown, next: () => Promise<void>) => next();
+    const localMiddleware = async (_context: unknown, next: () => Promise<void>) => next();
+
+    const routes: ScannedAppRoutesInput = {
+      entries: [
+        { file: "users/middleware.ts" },
+        { file: "users/index/page.vue" },
+        { file: "users/index/loader.ts" },
+        { file: "users/index/middleware.ts" },
+        { file: "users/[id]/page.vue" },
+      ],
+    };
+
+    const result = await createRouteRuntimeModules({
+      routes,
+      resolveModule: createModuleResolver({
+        "users/middleware.ts": { default: [treeMiddleware] },
+        "users/index/page.vue": { default: usersPage },
+        "users/index/loader.ts": { loader: indexLoader },
+        "users/index/middleware.ts": { default: [localMiddleware] },
+        "users/[id]/page.vue": { default: userPage },
+      }).resolve,
+    });
+
+    const usersRoute = asRoute(result.routes, "users/page");
+    expect(usersRoute.path).toBe("users");
+    expect(usersRoute.module.component).toBe(usersPage);
+    expect(usersRoute.module.loader).toBe(indexLoader);
+    expect(usersRoute.module.middleware).toEqual([localMiddleware]);
+
+    const userRoute = asRoute(result.routes, "users/[id]/page");
+    expect(userRoute.path).toBe("users/:id");
+    expect(userRoute.module.component).toBe(userPage);
+    expect(userRoute.module.middleware).toEqual([treeMiddleware]);
+  });
+
+  test("rejects page files in directories that also own child routes", async () => {
+    const routes: ScannedAppRoutesInput = {
+      entries: [{ file: "users/page.vue" }, { file: "users/[id]/page.vue" }],
+    };
+
+    await expect(
+      createRouteRuntimeModules({
+        routes,
+        resolveModule: createModuleResolver({
+          "users/page.vue": { default: { name: "UsersPage" } },
+          "users/[id]/page.vue": { default: { name: "UserPage" } },
+        }).resolve,
+      }),
+    ).rejects.toThrow(
+      'Route directory "users" defines page.vue alongside child routes. Move the route into users/index/.',
     );
   });
 });

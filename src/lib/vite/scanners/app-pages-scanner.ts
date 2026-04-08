@@ -88,17 +88,19 @@ function collectAppRouteModules(
     inheritedLayout: LayoutAnchor | null,
     inheritedDirectoryMiddleware: string[],
   ): void {
+    const normalizedNodeId = normalizeRouteNodeId(node.id);
+    const normalizedRouteSegments = normalizeManifestRouteSegments(node.segments);
     const { routeFiles, directoryMiddlewareFile } = collectAppNodeEntries(node, options);
     const nextDirectoryMiddleware = directoryMiddlewareFile
       ? [...inheritedDirectoryMiddleware, directoryMiddlewareFile]
       : inheritedDirectoryMiddleware;
-    const routeSegments = toManifestRouteSegments(node.segments);
     let currentLayout = inheritedLayout;
 
-    assertRouteDirectoryFiles(node.dir, routeFiles);
+    assertRouteDirectoryFiles(node, routeFiles);
+    assertIndexRouteDirectoryUsage(node, routeFiles);
 
     if (routeFiles.layout) {
-      const layoutId = createRouteId(node.id, "layout");
+      const layoutId = createRouteId(normalizedNodeId, "layout");
 
       modules.push(
         createScannedRouteModule({
@@ -112,14 +114,14 @@ function collectAppRouteModules(
             inheritedLayout?.middlewareDepth,
           ),
           files: createPrimaryRouteFiles(routeFiles, "layout"),
-          path: createLayoutPath(routeSegments, inheritedLayout?.segments),
+          path: createLayoutPath(normalizedRouteSegments, inheritedLayout?.segments),
           parentId: inheritedLayout?.id,
         }),
       );
 
       currentLayout = {
         id: layoutId,
-        segments: routeSegments,
+        segments: normalizedRouteSegments,
         middlewareDepth: nextDirectoryMiddleware.length,
       };
     }
@@ -127,7 +129,7 @@ function collectAppRouteModules(
     if (routeFiles.page) {
       modules.push(
         createScannedRouteModule({
-          id: createRouteId(node.id, "page"),
+          id: createRouteId(normalizedNodeId, "page"),
           kind: "page",
           root: options.root,
           routesDir: options.routesDir,
@@ -140,7 +142,7 @@ function collectAppRouteModules(
             ? { page: routeFiles.page }
             : createPrimaryRouteFiles(routeFiles, "page"),
           ...createPageRouteLocation(
-            routeSegments,
+            normalizedRouteSegments,
             inheritedLayout,
             currentLayout,
             Boolean(routeFiles.layout),
@@ -179,11 +181,32 @@ function collectAppNodeEntries(
     node.dir,
     DIRECTORY_MIDDLEWARE_BASENAME,
   );
+  const middleware = routeFiles.middleware;
+  const shouldPromoteMiddlewareToDirectory =
+    Boolean(middleware) &&
+    !routeFiles.page &&
+    !routeFiles.layout &&
+    node.children.length > 0 &&
+    !isIndexNode(node.dir);
+
+  if (shouldPromoteMiddlewareToDirectory) {
+    if (directoryMiddleware) {
+      throw new Error(
+        `Route directory ${node.dir || "."} defines both ${DIRECTORY_MIDDLEWARE_BASENAME}.ts and middleware.ts as directory middleware.`,
+      );
+    }
+
+    delete routeFiles.middleware;
+  }
+
+  const resolvedDirectoryMiddleware = shouldPromoteMiddlewareToDirectory
+    ? middleware
+    : directoryMiddleware;
 
   return {
     routeFiles,
-    directoryMiddlewareFile: directoryMiddleware
-      ? toRootRelativeRouteFile(options.root, options.routesDir, directoryMiddleware)
+    directoryMiddlewareFile: resolvedDirectoryMiddleware
+      ? toRootRelativeRouteFile(options.root, options.routesDir, resolvedDirectoryMiddleware)
       : undefined,
   };
 }
@@ -210,7 +233,7 @@ function createPrimaryRouteFiles(
 }
 
 function assertRouteDirectoryFiles(
-  relativeDir: string,
+  node: RouteNode<unknown, AppEntryKind>,
   routeFiles: Partial<Record<RouteFileBaseName, string>>,
 ): void {
   const hasAuxiliaryFiles = ROUTE_FILE_BASENAMES.some(
@@ -229,7 +252,20 @@ function assertRouteDirectoryFiles(
   );
 
   throw new Error(
-    `Route directory ${relativeDir || "."} contains ${presentFiles.join(", ")} but is missing page/layout.`,
+    `Route directory ${node.dir || "."} contains ${presentFiles.join(", ")} but is missing page/layout.`,
+  );
+}
+
+function assertIndexRouteDirectoryUsage(
+  node: RouteNode<unknown, AppEntryKind>,
+  routeFiles: Partial<Record<RouteFileBaseName, string>>,
+): void {
+  if (!routeFiles.page || node.children.length === 0 || isIndexNode(node.dir)) {
+    return;
+  }
+
+  throw new Error(
+    `Route directory ${node.dir || "."} defines page.vue alongside child routes. Move the route into ${node.dir || "."}/index/.`,
   );
 }
 
@@ -350,4 +386,21 @@ function toManifestRouteSegments(segments: SegmentToken[]): string[] {
 
     return [];
   });
+}
+
+function normalizeRouteNodeId(nodeId: string): string {
+  if (!nodeId || nodeId === "index") {
+    return "";
+  }
+
+  return nodeId.endsWith("/index") ? nodeId.slice(0, -"/index".length) : nodeId;
+}
+
+function normalizeManifestRouteSegments(segments: SegmentToken[]): string[] {
+  const normalized = toManifestRouteSegments(segments);
+  return normalized[normalized.length - 1] === "index" ? normalized.slice(0, -1) : normalized;
+}
+
+function isIndexNode(dir: string): boolean {
+  return dir === "index" || dir.endsWith("/index");
 }

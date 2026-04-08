@@ -31,16 +31,9 @@ export function buildAppRouteTree(
       const extension = extname(file);
       const baseName = basename(file, extension);
 
-      if (baseName === "_middleware") {
-        return {
-          kind: "directory-middleware",
-          scope: "directory",
-        };
-      }
-
       if (ROUTE_ENTRY_BASENAMES.has(baseName)) {
         return {
-          kind: baseName as Exclude<AppRouteEntryKind, "directory-middleware">,
+          kind: baseName as AppRouteEntryKind,
         };
       }
 

@@ -26,8 +26,7 @@ export type AppRouteEntryKind =
   | "error"
   | "loader"
   | "action"
-  | "middleware"
-  | "directory-middleware";
+  | "middleware";
 
 /**
  * Input from the scanner for app routes.

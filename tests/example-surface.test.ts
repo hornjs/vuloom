@@ -49,7 +49,7 @@ describe("zero-config example phial surface", () => {
     expect(readme).not.toContain("From `packages/phial`:");
     expect(readme).not.toContain("\nphial prepare\nphial build\nphial start\n");
 
-    const homePageSource = readExampleFile("app/pages/page.ts");
+    const homePageSource = readExampleFile("app/pages/index/page.ts");
     expect(homePageSource).not.toContain("this.data.value");
     expect(homePageSource).not.toContain("this.layoutData.value");
     expect(homePageSource).not.toContain("this.actionData.value");
@@ -64,7 +64,7 @@ describe("zero-config example phial surface", () => {
     expect(blogLoadingSource).not.toContain("routeId:");
     expect(blogLoadingSource).not.toContain("location:");
 
-    const rootLoadingSource = readExampleFile("app/pages/loading.ts");
+    const rootLoadingSource = readExampleFile("app/pages/index/loading.ts");
     expect(rootLoadingSource).toContain("route:");
     expect(rootLoadingSource).not.toContain("routeId:");
     expect(rootLoadingSource).not.toContain("location:");
@@ -74,7 +74,7 @@ describe("zero-config example phial surface", () => {
       "app/app.vue",
       "app/error.vue",
       "app/pages/layout.ts",
-      "app/pages/page.ts",
+      "app/pages/index/page.ts",
       "app/pages/jsx/page.tsx",
       "app/pages/sfc/page.vue",
       "app/pages/blog/[slug]/page.ts",

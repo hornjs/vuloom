@@ -18,7 +18,6 @@ const SINGLE_ENTRY_KINDS = new Set<AppRouteEntryKind>([
   "loader",
   "action",
   "middleware",
-  "directory-middleware",
 ]);
 
 export async function resolveRouteModules(options: {
@@ -37,35 +36,36 @@ export async function resolveRouteModules(options: {
   async function visitNode(
     node: RouteNode<unknown, AppRouteEntryKind>,
     inheritedLayout: LayoutAnchor | null,
-    inheritedDirectoryMiddleware: PageMiddleware[],
+    inheritedTreeMiddleware: PageMiddleware[],
   ): Promise<void> {
     const entryFiles = collectEntryFiles(node);
-    assertRouteDirectoryFiles(node.dir, entryFiles);
+    const normalizedNodeId = normalizeRouteNodeId(node.id);
+    const routeSegments = normalizeRoutePathSegments(node.segments);
+    const inheritedMiddlewareFile = consumeInheritedMiddlewareEntry(node, entryFiles);
+
+    assertRouteDirectoryFiles(node, entryFiles);
+    assertIndexRouteDirectoryUsage(node, entryFiles);
     assertActionSidecar(entryFiles, node.dir);
 
-    const localDirectoryMiddleware = entryFiles["directory-middleware"]
+    const localTreeMiddleware = inheritedMiddlewareFile
       ? await resolveMiddlewareReferences(
-          entryFiles["directory-middleware"],
+          inheritedMiddlewareFile,
           options.resolveModule,
           options.middlewareRegistry,
         )
       : [];
-    const nextDirectoryMiddleware = [...inheritedDirectoryMiddleware, ...localDirectoryMiddleware];
-    const routeSegments = toRoutePathSegments(node.segments);
+    const nextTreeMiddleware = [...inheritedTreeMiddleware, ...localTreeMiddleware];
     const attachSidecarsToPage = Boolean(entryFiles.page);
     let currentLayout = inheritedLayout;
 
     if (entryFiles.layout) {
       const route: PendingRouteRecord = {
-        id: createRouteId(node.id, "layout"),
+        id: createRouteId(normalizedNodeId, "layout"),
         path: createLayoutPath(routeSegments, inheritedLayout?.segments),
         module: {
           layout: await resolveComponentExport(entryFiles.layout, options.resolveModule),
-          ...(await createDirectoryMiddlewareModule(
-            createDirectoryMiddlewareDelta(
-              nextDirectoryMiddleware,
-              inheritedLayout?.middlewareDepth,
-            ),
+          ...(await createInheritedMiddlewareModule(
+            createInheritedMiddlewareDelta(nextTreeMiddleware, inheritedLayout?.middlewareDepth),
           )),
           ...(!attachSidecarsToPage
             ? await resolvePrimaryRouteSidecars(
@@ -83,7 +83,7 @@ export async function resolveRouteModules(options: {
       currentLayout = {
         id: route.id,
         segments: routeSegments,
-        middlewareDepth: nextDirectoryMiddleware.length,
+        middlewareDepth: nextTreeMiddleware.length,
       };
     }
 
@@ -95,13 +95,13 @@ export async function resolveRouteModules(options: {
         Boolean(entryFiles.layout),
       );
       const route: PendingRouteRecord = {
-        id: createRouteId(node.id, "page"),
+        id: createRouteId(normalizedNodeId, "page"),
         path: location.path,
         module: {
           component: await resolveComponentExport(entryFiles.page, options.resolveModule),
-          ...(await createDirectoryMiddlewareModule(
-            createDirectoryMiddlewareDelta(
-              nextDirectoryMiddleware,
+          ...(await createInheritedMiddlewareModule(
+            createInheritedMiddlewareDelta(
+              nextTreeMiddleware,
               currentLayout?.middlewareDepth ?? inheritedLayout?.middlewareDepth,
             ),
           )),
@@ -120,20 +120,20 @@ export async function resolveRouteModules(options: {
     }
 
     for (const child of node.children) {
-      await visitNode(child, currentLayout, nextDirectoryMiddleware);
+      await visitNode(child, currentLayout, nextTreeMiddleware);
     }
   }
 }
 
-async function createDirectoryMiddlewareModule(
-  directoryMiddleware: PageMiddleware[],
+async function createInheritedMiddlewareModule(
+  inheritedMiddleware: PageMiddleware[],
 ): Promise<Partial<PageRouteModule>> {
-  if (directoryMiddleware.length === 0) {
+  if (inheritedMiddleware.length === 0) {
     return {};
   }
 
   return {
-    middleware: [...directoryMiddleware],
+    middleware: [...inheritedMiddleware],
   };
 }
 
@@ -223,8 +223,28 @@ function collectEntryFiles(
   return files;
 }
 
+function consumeInheritedMiddlewareEntry(
+  node: RouteNode<unknown, AppRouteEntryKind>,
+  entryFiles: Partial<Record<AppRouteEntryKind, string>>,
+): string | undefined {
+  const middleware = entryFiles.middleware;
+  const shouldPromoteMiddlewareToDirectory =
+    Boolean(middleware) &&
+    !entryFiles.page &&
+    !entryFiles.layout &&
+    node.children.length > 0 &&
+    !isIndexNode(node.dir);
+
+  if (!shouldPromoteMiddlewareToDirectory) {
+    return undefined;
+  }
+
+  delete entryFiles.middleware;
+  return middleware;
+}
+
 function assertRouteDirectoryFiles(
-  dir: string,
+  node: RouteNode<unknown, AppRouteEntryKind>,
   entryFiles: Partial<Record<AppRouteEntryKind, string>>,
 ): void {
   const presentAuxiliaryEntries = [
@@ -245,7 +265,20 @@ function assertRouteDirectoryFiles(
 
   const presentNames = presentAuxiliaryEntries.map((file) => file?.split("/").pop());
   throw new Error(
-    `Route directory "${dir || "."}" contains ${presentNames.join(", ")} but is missing page.vue or layout.vue.`,
+    `Route directory "${node.dir || "."}" contains ${presentNames.join(", ")} but is missing page.vue or layout.vue.`,
+  );
+}
+
+function assertIndexRouteDirectoryUsage(
+  node: RouteNode<unknown, AppRouteEntryKind>,
+  entryFiles: Partial<Record<AppRouteEntryKind, string>>,
+): void {
+  if (!entryFiles.page || node.children.length === 0 || isIndexNode(node.dir)) {
+    return;
+  }
+
+  throw new Error(
+    `Route directory "${node.dir || "."}" defines page.vue alongside child routes. Move the route into ${node.dir || "."}/index/.`,
   );
 }
 
@@ -310,8 +343,8 @@ function createLayoutPath(segments: string[], parentSegments?: string[]): string
   return relativeSegments.length > 0 ? relativeSegments.join("/") : "";
 }
 
-function createDirectoryMiddlewareDelta(directoryMiddleware: PageMiddleware[], startIndex = 0) {
-  return directoryMiddleware.slice(startIndex);
+function createInheritedMiddlewareDelta(inheritedMiddleware: PageMiddleware[], startIndex = 0) {
+  return inheritedMiddleware.slice(startIndex);
 }
 
 function toRoutePathSegments(tokens: RouteSegmentToken[]): string[] {
@@ -336,6 +369,23 @@ function toRoutePathSegments(tokens: RouteSegmentToken[]): string[] {
   }
 
   return segments;
+}
+
+function normalizeRouteNodeId(nodeId: string): string {
+  if (!nodeId || nodeId === "index") {
+    return "";
+  }
+
+  return nodeId.endsWith("/index") ? nodeId.slice(0, -"/index".length) : nodeId;
+}
+
+function normalizeRoutePathSegments(tokens: RouteSegmentToken[]): string[] {
+  const segments = toRoutePathSegments(tokens);
+  return segments[segments.length - 1] === "index" ? segments.slice(0, -1) : segments;
+}
+
+function isIndexNode(dir: string): boolean {
+  return dir === "index" || dir.endsWith("/index");
 }
 
 function nestRouteRecords(records: PendingRouteRecord[]): PageRouteRecord[] {
