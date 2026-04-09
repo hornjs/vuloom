@@ -1,0 +1,8 @@
+name = "phial"
+compatibility_date = "2026-04-09"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "phial_docs_db"
+database_name = "phial-docs-db"
+database_id = "dc2af549-acd2-4fba-b519-bc6717157574"
