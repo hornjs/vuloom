@@ -1,8 +1,0 @@
-{
-  "../../virtual:phial-client-entry": {
-    "file": "assets/client-entry-BAPrGr10.js",
-    "name": "client-entry",
-    "src": "../../virtual:phial-client-entry",
-    "isEntry": true
-  }
-}
