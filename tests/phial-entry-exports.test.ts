@@ -117,6 +117,14 @@ describe("phial public entry surface", () => {
     expect(appTypes).toContain("LoaderContext");
     expect(appTypes).toContain("ActionContext");
     expect(appTypes).toContain("PageMiddleware");
+    expect(appTypes).toContain("ClientOnly");
+    expect(appTypes).toContain("DevOnly");
+    expect(appTypes).toContain("useHead");
+    expect(appTypes).toContain("useTitle");
+    expect(appTypes).toContain("useMeta");
+    expect(appTypes).toContain("useLink");
+    expect(appTypes).toContain("useStyle");
+    expect(appTypes).toContain("useScript");
     expect(serverTypes).toContain("ServerHandler");
     expect(serverTypes).toContain("ServerMiddleware");
     expect(serverTypes).toContain("InvocationContext");

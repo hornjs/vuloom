@@ -11,12 +11,21 @@
 
 // 客户端组件
 export {
+  ClientOnly,
+  DevOnly,
   RouterLink,
   RouterView,
 } from "vuepagelet";
 
 // 客户端 Composables (Hooks)
 export {
+  // Head
+  useHead,
+  useTitle,
+  useMeta,
+  useLink,
+  useStyle,
+  useScript,
   // App 数据
   useAppData,
   useAppError,
@@ -40,6 +49,15 @@ export {
   useSubmit,
   useFetcher,
   useFormAction,
+} from "vuepagelet";
+
+export type {
+  HeadAttributes,
+  HeadInput,
+  HeadLinkDescriptor,
+  HeadMetaDescriptor,
+  HeadScriptDescriptor,
+  HeadStyleDescriptor,
 } from "vuepagelet";
 
 // 服务端/Loader/Action 上下文类型
