@@ -8,8 +8,8 @@ import { describe, expect, it } from "vitest";
 const repoRoot = resolve(import.meta.dirname, "..");
 const execFileAsync = promisify(execFile);
 
-describe("phial public entry surface", () => {
-  it("matches the phial-branded package and public API contract", async () => {
+describe("vuloom public entry surface", () => {
+  it("matches the vuloom-branded package and public API contract", async () => {
     const packageJson = await readFile(resolve(repoRoot, "package.json"), "utf8");
     const readme = await readFile(resolve(repoRoot, "README.md"), "utf8");
     const sourceBin = await readFile(resolve(repoRoot, "src/bin.ts"), "utf8");
@@ -28,13 +28,13 @@ describe("phial public entry surface", () => {
     await expect(access(resolve(repoRoot, "src/bin.ts"))).resolves.toBeUndefined();
 
     expect(packageJsonData.bin).toEqual({
-      phial: "./src/bin.ts",
+      vuloom: "./src/bin.ts",
     });
     expect(packageJsonData.files).toEqual(expect.arrayContaining(["dist"]));
-    expect(packageJsonData.files).not.toContain("bin/phial.mjs");
+    expect(packageJsonData.files).not.toContain("bin/vuloom.mjs");
     expect(sourceBin).toContain("#!/usr/bin/env node");
-    expect(sourceBin).toContain('import { runPhialCli } from "./lib/cli.js";');
-    expect(sourceBin).toContain("process.exitCode = await runPhialCli(process.argv.slice(2));");
+    expect(sourceBin).toContain('import { runVuloomCli } from "./lib/cli.js";');
+    expect(sourceBin).toContain("process.exitCode = await runVuloomCli(process.argv.slice(2));");
     expect(packageJsonData.exports).toMatchObject({
       ".": "./src/index.ts",
       "./vite": "./src/vite.ts",
@@ -99,8 +99,8 @@ describe("phial public entry surface", () => {
     expect(indexDist).not.toHaveProperty("runHornCli");
     expect(indexTypes).toContain('export {');
 
-    expect(vitePluginDist).toHaveProperty("phial");
-    expect(vitePluginDist).not.toHaveProperty("phialVitePlugin");
+    expect(vitePluginDist).toHaveProperty("vuloom");
+    expect(vitePluginDist).not.toHaveProperty("vuloomVitePlugin");
     expect(vitePluginDist).not.toHaveProperty("DEFAULT_CLIENT_BUILD_OUT_DIR");
     expect(vitePluginDist).not.toHaveProperty("DEFAULT_SERVER_BUILD_OUT_DIR");
     expect(vitePluginDist).not.toHaveProperty("loadHornConfig");
@@ -129,8 +129,8 @@ describe("phial public entry surface", () => {
     expect(serverTypes).toContain("ServerMiddleware");
     expect(serverTypes).toContain("InvocationContext");
 
-    expect(vitePluginTypes).toContain("PhialOptions");
-    expect(vitePluginTypes).not.toContain("PhialVitePluginOptions");
+    expect(vitePluginTypes).toContain("VuloomOptions");
+    expect(vitePluginTypes).not.toContain("VuloomVitePluginOptions");
     expect(vitePluginTypes).not.toContain("loadHornConfig as loadHornConfig");
     expect(vitePluginTypes).not.toContain("buildHornApp as buildHornApp");
     expect(vitePluginTypes).not.toContain("prepareHornApp as prepareHornApp");
@@ -169,17 +169,17 @@ describe("phial public entry surface", () => {
     const packedFiles = prepareOutput.packedFiles?.map((entry) => entry.file) ?? [];
 
     expect(prepareOutput.packageJSON?.bin).toEqual({
-      phial: "./dist/bin.js",
+      vuloom: "./dist/bin.js",
     });
-    expect(prepareOutput.packageJSON?.files).not.toContain("bin/phial.mjs");
+    expect(prepareOutput.packageJSON?.files).not.toContain("bin/vuloom.mjs");
 
     const publishBin = resolve(repoRoot, ".prepare-publish/dist/bin.js");
     const publishBinRun = await execFileAsync("node", [publishBin], {
       cwd: repoRoot,
     });
 
-    expect(publishBinRun.stdout).toContain("Usage: phial");
-    expect(publishBinRun.stdout).toContain("phial dev");
+    expect(publishBinRun.stdout).toContain("Usage: vuloom");
+    expect(publishBinRun.stdout).toContain("vuloom dev");
     expect(publishBinRun.stdout).not.toContain("horn");
     expect(publishBinRun.stderr).toBe("");
 
@@ -194,18 +194,18 @@ describe("phial public entry surface", () => {
       ]),
     );
 
-    expect(extractTopLevelTitle(readme)).toBe("phial");
+    expect(extractTopLevelTitle(readme)).toBe("vuloom");
     expect(extractPublicEntryPoints(readme)).toEqual([
-      "phial",
-      "phial/vite",
-      "phial/app",
-      "phial/server",
+      "vuloom",
+      "vuloom/vite",
+      "vuloom/app",
+      "vuloom/server",
     ]);
     expect(extractSectionParagraph(readme, "Public entry points")).toContain(
-      "phial exports the package version",
+      "vuloom exports the package version",
     );
     expect(extractSectionParagraph(readme, "Public entry points")).toContain(
-      "phial/vite provides the Vite plugin, config utilities, and build tools",
+      "vuloom/vite provides the Vite plugin, config utilities, and build tools",
     );
   }, 20_000);
 });

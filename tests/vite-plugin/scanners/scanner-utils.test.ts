@@ -57,7 +57,7 @@ describe("scanner-utils", () => {
     ];
 
     expect(() => assertServerRouteConflicts(appModules, serverRoutes)).toThrow(
-      'Server route "/posts/:id" from server/routes/posts/[id].ts conflicts with app page path "/posts/:slug". Phial does not split path ownership between app/pages and server/routes, even across different HTTP methods.',
+      'Server route "/posts/:id" from server/routes/posts/[id].ts conflicts with app page path "/posts/:slug". Vuloom does not split path ownership between app/pages and server/routes, even across different HTTP methods.',
     );
   });
 });

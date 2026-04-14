@@ -10,7 +10,7 @@ import {
 const tempRoots: string[] = [];
 
 async function createTempRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "phial-server-scan-"));
+  const root = await mkdtemp(join(tmpdir(), "vuloom-server-scan-"));
   tempRoots.push(root);
   return root;
 }
@@ -81,7 +81,7 @@ describe("server scanners", () => {
     });
   });
 
-  test("scanServerRoutes reports ambiguous parameterized signatures with a phial-level error", async () => {
+  test("scanServerRoutes reports ambiguous parameterized signatures with a vuloom-level error", async () => {
     const root = await createTempRoot();
     await writeFiles(root, {
       "server/routes/users/[id].ts": "export default {}",

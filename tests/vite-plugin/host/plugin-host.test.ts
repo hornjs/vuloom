@@ -1,17 +1,17 @@
 import { describe, expect, test } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { createPhialBuildServerEntryModule } from "../../../src/lib/host/plugin-build";
+import { createVuloomBuildServerEntryModule } from "../../../src/lib/host/plugin-build";
 
 describe("plugin host", () => {
   test("server entry targets sevok plugins instead of horn server runtime", () => {
-    const source = createPhialBuildServerEntryModule();
+    const source = createVuloomBuildServerEntryModule();
 
     expect(source).toContain("sevok");
     expect(source).toContain("sevok/node");
     expect(source).toContain("NodeRuntimeAdapter");
-    expect(source).toContain("phial/generated-app-plugin");
-    expect(source).toContain("phial/generated-server-plugin");
+    expect(source).toContain("vuloom/generated-app-plugin");
+    expect(source).toContain("vuloom/generated-server-plugin");
     expect(source).toContain("manual = false");
   });
 
@@ -26,26 +26,26 @@ describe("plugin host", () => {
     expect(source).toContain("await app.ready()");
   });
 
-  test("dev host only remaps phial package source entrypoints that remain public", () => {
+  test("dev host only remaps vuloom package source entrypoints that remain public", () => {
     const source = readFileSync(
       resolve(import.meta.dirname, "../../../src/lib/host/plugin-dev-server.ts"),
       "utf8",
     );
 
-    expect(source).toContain('const PHIAL_PACKAGE_ID = "phial";');
+    expect(source).toContain('const VULOOM_PACKAGE_ID = "vuloom";');
     expect(source).toContain('return resolve(currentDir, "../../../..");');
     expect(source).not.toContain('resolveWorkspacePackageRoot("horn")');
-    expect(source).toContain("id === `${PHIAL_PACKAGE_ID}/vite`");
-    expect(source).not.toContain("id === `${PHIAL_PACKAGE_ID}/server`");
-    expect(source).not.toContain("id === `${PHIAL_PACKAGE_ID}/internal/vite-plugin`");
-    expect(source).not.toContain("ssrLoadModule(`${PHIAL_PACKAGE_ID}/server`)");
-    expect(source).not.toContain("id === `${PHIAL_PACKAGE_ID}/client`");
+    expect(source).toContain("id === `${VULOOM_PACKAGE_ID}/vite`");
+    expect(source).not.toContain("id === `${VULOOM_PACKAGE_ID}/server`");
+    expect(source).not.toContain("id === `${VULOOM_PACKAGE_ID}/internal/vite-plugin`");
+    expect(source).not.toContain("ssrLoadModule(`${VULOOM_PACKAGE_ID}/server`)");
+    expect(source).not.toContain("id === `${VULOOM_PACKAGE_ID}/client`");
     expect(source).not.toContain("createServerRoutesPlugin(");
     expect(source).not.toContain("@revuejs/vue");
     expect(source).not.toContain("VUE_PACKAGE_ID");
     expect(source).not.toContain("src/source.ts");
-    expect(source).not.toContain(`${"${PHIAL_PACKAGE_ID}"}/generated-app-runtime`);
-    expect(source).not.toContain(`${"${PHIAL_PACKAGE_ID}"}/generated-server-routes`);
+    expect(source).not.toContain(`${"${VULOOM_PACKAGE_ID}"}/generated-app-runtime`);
+    expect(source).not.toContain(`${"${VULOOM_PACKAGE_ID}"}/generated-server-routes`);
   });
 
   test("runtime-facing dynamic imports are annotated for vite ssr analysis", () => {
@@ -115,7 +115,7 @@ describe("plugin host", () => {
     expect(existsSync(sharedSourcePath)).toBe(false);
   });
 
-  test("phial owns generated module ambient declarations", () => {
+  test("vuloom owns generated module ambient declarations", () => {
     const source = readFileSync(
       resolve(import.meta.dirname, "../../../src/lib/generated-routes.d.ts"),
       "utf8",
@@ -127,8 +127,8 @@ describe("plugin host", () => {
       exports: Record<string, { types?: string } | string>;
     };
 
-    expect(source).toContain('declare module "phial/generated-app-runtime"');
-    expect(source).toContain('declare module "phial/generated-server-plugin"');
+    expect(source).toContain('declare module "vuloom/generated-app-runtime"');
+    expect(source).toContain('declare module "vuloom/generated-server-plugin"');
     // files should not include src files - prepare-publish handles this
     expect(packageJson.exports["./generated-app-runtime"]).toEqual("./src/lib/generated-routes.d.ts");
     expect(packageJson.exports["./generated-server-plugin"]).toEqual("./src/lib/generated-routes.d.ts");

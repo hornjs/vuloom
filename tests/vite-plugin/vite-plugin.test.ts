@@ -4,21 +4,21 @@ import { dirname, join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { ResolvedConfig, Plugin } from "vite";
 import {
-  DEFAULT_PHIAL_CONFIG_FILES,
-  isPhialConfigFile,
-  loadPhialConfig,
+  DEFAULT_VULOOM_CONFIG_FILES,
+  isVuloomConfigFile,
+  loadVuloomConfig,
 } from "../../src/lib/config/index.ts";
 import {
   GENERATED_APP_PLUGIN_ID,
   GENERATED_SERVER_PLUGIN_ID,
   resolveVirtualModuleId,
 } from "../../src/lib/vite/generated/virtual-modules.ts";
-import { phial } from "../../src/vite.ts";
+import { vuloom } from "../../src/vite.ts";
 
 const tempRoots: string[] = [];
 
 async function createTempRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "phial-vite-plugin-"));
+  const root = await mkdtemp(join(tmpdir(), "vuloom-vite-plugin-"));
   tempRoots.push(root);
   return root;
 }
@@ -62,28 +62,28 @@ afterEach(async () => {
   }
 });
 
-describe("phial", () => {
-  test("prefers phial config files and ignores horn config filenames", async () => {
+describe("vuloom", () => {
+  test("prefers vuloom config files and ignores horn config filenames", async () => {
     const root = await createTempRoot();
     await writeFiles(root, {
-      "phial.config.ts": "export default {}",
+      "vuloom.config.ts": "export default {}",
     });
 
-    expect(DEFAULT_PHIAL_CONFIG_FILES).toEqual([
-      "phial.config.ts",
-      "phial.config.mts",
-      "phial.config.js",
-      "phial.config.mjs",
-      "phial.config.cts",
-      "phial.config.cjs",
+    expect(DEFAULT_VULOOM_CONFIG_FILES).toEqual([
+      "vuloom.config.ts",
+      "vuloom.config.mts",
+      "vuloom.config.js",
+      "vuloom.config.mjs",
+      "vuloom.config.cts",
+      "vuloom.config.cjs",
     ]);
-    expect(isPhialConfigFile("phial.config.ts")).toBe(true);
-    expect(isPhialConfigFile("/tmp/phial.config.ts")).toBe(true);
-    expect(isPhialConfigFile("horn.config.ts")).toBe(false);
+    expect(isVuloomConfigFile("vuloom.config.ts")).toBe(true);
+    expect(isVuloomConfigFile("/tmp/vuloom.config.ts")).toBe(true);
+    expect(isVuloomConfigFile("horn.config.ts")).toBe(false);
 
-    const loaded = await loadPhialConfig({ root });
+    const loaded = await loadVuloomConfig({ root });
 
-    expect(loaded.file).toContain("phial.config.ts");
+    expect(loaded.file).toContain("vuloom.config.ts");
     expect(loaded.file).not.toContain("horn.config.ts");
   });
 
@@ -96,7 +96,7 @@ describe("phial", () => {
       "server/routes/ping.ts": "export default { GET() { return new Response('pong') } }",
     });
 
-    const plugin = phial({
+    const plugin = vuloom({
       root,
       extensions: [".vue", ".ts"],
     });
@@ -129,11 +129,11 @@ describe("phial", () => {
 
     expect(appPluginId).toBe(`\0${GENERATED_APP_PLUGIN_ID}`);
     expect(serverPluginId).toBe(`\0${GENERATED_SERVER_PLUGIN_ID}`);
-    expect(resolveVirtualModuleId("phial/generated-app-plugin")).toBe(
-      "\0phial/generated-app-plugin",
+    expect(resolveVirtualModuleId("vuloom/generated-app-plugin")).toBe(
+      "\0vuloom/generated-app-plugin",
     );
-    expect(resolveVirtualModuleId("phial/generated-server-plugin")).toBe(
-      "\0phial/generated-server-plugin",
+    expect(resolveVirtualModuleId("vuloom/generated-server-plugin")).toBe(
+      "\0vuloom/generated-server-plugin",
     );
 
     const appPluginModule = await callLoad(plugin, appPluginId as string);
@@ -157,7 +157,7 @@ describe("phial", () => {
         "import { defineComponent, h } from 'vue'; export default defineComponent({ setup(){ return () => h('div', null, 'home') } });",
     });
 
-    const plugin = phial({
+    const plugin = vuloom({
       root,
       extensions: [".vue", ".ts"],
     });

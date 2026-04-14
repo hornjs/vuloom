@@ -36,10 +36,10 @@ describe("generated module type surface", () => {
     );
     expect(packageJson.exports["./generated-config"]).toEqual("./src/lib/generated-routes.d.ts");
 
-    expect(source).toContain('declare module "phial/generated-routes-manifest"');
-    expect(source).toContain('declare module "phial/generated-app-runtime"');
-    expect(source).toContain('declare module "phial/generated-config"');
-    expect(source).toContain("declare namespace PhialGeneratedTypes");
+    expect(source).toContain('declare module "vuloom/generated-routes-manifest"');
+    expect(source).toContain('declare module "vuloom/generated-app-runtime"');
+    expect(source).toContain('declare module "vuloom/generated-config"');
+    expect(source).toContain("declare namespace VuloomGeneratedTypes");
     expect(source).toContain("type ServerRouteHandler = import(\"sevok\").ServerHandler;");
     expect(source).toContain("type ServerMiddleware = import(\"sevok\").ServerMiddleware;");
     expect(source).toContain("type ServerMiddlewareFunction = import(\"sevok\").ServerMiddlewareFunction;");

@@ -90,7 +90,7 @@ describe("virtual module generators", () => {
 
     expect(manifestModule).toContain("export const manifest = [");
     expect(runtimeModule).toContain("vuepagelet/integration");
-    expect(runtimeModule).toContain("phial/generated-app-middleware");
+    expect(runtimeModule).toContain("vuloom/generated-app-middleware");
     expect(runtimeModule).toContain("resolveMiddlewareReferences");
     expect(runtimeModule).toContain("resolvedModule.directoryMiddleware");
     expect(runtimeModule).toContain("attachAppMiddleware");
@@ -125,15 +125,15 @@ describe("virtual module generators", () => {
     );
     expect(serverPluginModule).not.toContain("const result = await handler(request)");
     expect(routesModule).toContain("export const routeFiles = {");
-    expect(routesModule).toContain("createPhialRouteModule");
+    expect(routesModule).toContain("createVuloomRouteModule");
     expect(routesModule).toContain(
       'shouldRevalidate: resolveNamedExport(primaryModule, "shouldRevalidate")',
     );
     expect(clientEntry).toContain("integration.hydrate().mount()");
-    expect(clientEntry).toContain("phial/generated-app-runtime");
-    expect(clientEntry).toContain("phial/generated-app-plugin");
-    expect(clientEntry).toContain("phial/generated-server-plugin");
-    expect(clientEntry).toContain("[phial]");
+    expect(clientEntry).toContain("vuloom/generated-app-runtime");
+    expect(clientEntry).toContain("vuloom/generated-app-plugin");
+    expect(clientEntry).toContain("vuloom/generated-server-plugin");
+    expect(clientEntry).toContain("[vuloom]");
   });
 
   test("generates server routes in the shape expected by the sevok server plugin", () => {
@@ -157,14 +157,14 @@ describe("virtual module generators", () => {
       }),
     ).toContain("export const hasConfig = true");
 
-    expect(resolveVirtualModuleId("phial/generated-routes-manifest")).toBe(
-      "\0phial/generated-routes-manifest",
+    expect(resolveVirtualModuleId("vuloom/generated-routes-manifest")).toBe(
+      "\0vuloom/generated-routes-manifest",
     );
-    expect(resolveVirtualModuleId("phial/generated-routes-manifest")).toBe(
-      "\0phial/generated-routes-manifest",
+    expect(resolveVirtualModuleId("vuloom/generated-routes-manifest")).toBe(
+      "\0vuloom/generated-routes-manifest",
     );
-    expect(resolveVirtualModuleId("virtual:phial-routes-manifest")).toBe(
-      "\0virtual:phial-routes-manifest",
+    expect(resolveVirtualModuleId("virtual:vuloom-routes-manifest")).toBe(
+      "\0virtual:vuloom-routes-manifest",
     );
     expect(resolveVirtualModuleId("virtual:unknown")).toBeNull();
   });

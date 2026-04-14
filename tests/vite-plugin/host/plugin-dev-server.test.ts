@@ -3,7 +3,7 @@ import {
   createAppRouteMiddleware,
 } from "../../../src/lib/app-routes/index.ts";
 import {
-  createPhialViteInlineConfig,
+  createVuloomViteInlineConfig,
   createDevRequestHandler,
   resolveDevServerUrl,
 } from "../../../src/lib/host/plugin-dev-server.ts";
@@ -11,7 +11,7 @@ import {
 describe("plugin dev server", () => {
   test("creates a sevok request handler from generated server/app plugins", async () => {
     const ssrLoadModule = vi.fn(async (id: string) => {
-      if (id === "phial/generated-server-plugin") {
+      if (id === "vuloom/generated-server-plugin") {
         // Server plugin now returns middleware directly
         return {
           default: () => async (context: any, next: any) => {
@@ -24,7 +24,7 @@ describe("plugin dev server", () => {
         };
       }
 
-      if (id === "phial/generated-app-plugin") {
+      if (id === "vuloom/generated-app-plugin") {
         return {
           default: () =>
             createAppRouteMiddleware({
@@ -54,8 +54,8 @@ describe("plugin dev server", () => {
     const missingResponse = await handler.fetch(new Request("http://local/missing"));
     expect(missingResponse.status).toBe(404);
 
-    expect(ssrLoadModule).toHaveBeenNthCalledWith(1, "phial/generated-app-plugin");
-    expect(ssrLoadModule).toHaveBeenNthCalledWith(2, "phial/generated-server-plugin");
+    expect(ssrLoadModule).toHaveBeenNthCalledWith(1, "vuloom/generated-app-plugin");
+    expect(ssrLoadModule).toHaveBeenNthCalledWith(2, "vuloom/generated-server-plugin");
   });
 
   test("resolves the public dev url from the bound server address", () => {
@@ -76,7 +76,7 @@ describe("plugin dev server", () => {
 
   test("binds vite hmr to the current dev http server", () => {
     const hmrServer = {} as never;
-    const config = createPhialViteInlineConfig({}, "/project", undefined, hmrServer);
+    const config = createVuloomViteInlineConfig({}, "/project", undefined, hmrServer);
 
     expect(config.server?.middlewareMode).toBe(true);
     expect(config.server?.hmr).toMatchObject({
