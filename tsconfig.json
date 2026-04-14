@@ -20,7 +20,7 @@
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
-    "tsBuildInfoFile": "./node_modules/.cache/phial.tsbuildinfo",
+    "tsBuildInfoFile": "./node_modules/.cache/vuloom.tsbuildinfo",
     "types": ["node", "vite/client"]
   },
   "include": [

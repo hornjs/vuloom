@@ -1,20 +1,20 @@
 {
-  "name": "phial",
+  "name": "vuloom",
   "version": "0.0.5",
   "type": "module",
   "description": "",
   "author": "Maofeng <hornjs@qq.com>",
   "license": "MIT",
-  "homepage": "https://github.com/hornjs/phial#readme",
+  "homepage": "https://github.com/hornjs/vuloom#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hornjs/phial.git"
+    "url": "git+https://github.com/hornjs/vuloom.git"
   },
   "bugs": {
-    "url": "https://github.com/hornjs/phial/issues"
+    "url": "https://github.com/hornjs/vuloom/issues"
   },
   "bin": {
-    "phial": "./src/bin.ts"
+    "vuloom": "./src/bin.ts"
   },
   "files": [
     "dist",
