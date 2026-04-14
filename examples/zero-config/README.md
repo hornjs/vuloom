@@ -1,6 +1,6 @@
 # Zero-Config Example
 
-This example shows the current smallest working `phial` app with file routes, no manual route registration, `phial.config.ts` as the only bootstrap declaration, `app/loader.ts` shell data, `app/app.config.ts` named middleware registration, directory-scoped `middleware.ts`, route loading boundaries, a page `action`, and `server/routes` HTTP handlers with global and directory-scoped server middleware.
+This example shows the current smallest working `vuloom` app with file routes, no manual route registration, `vuloom.config.ts` as the only bootstrap declaration, `app/loader.ts` shell data, `app/app.config.ts` named middleware registration, directory-scoped `middleware.ts`, route loading boundaries, a page `action`, and `server/routes` HTTP handlers with global and directory-scoped server middleware.
 
 `app/app.vue` is the full document shell (`html/head/body`), and the default client runtime hydrates that document shell automatically. `app/loader.ts` provides shell-level server data for `useAppData()`, while `app/app.config.ts` registers app-level middleware by name. `app/pages/layout.ts` handles the route layout, `app/pages/index/loading.ts` renders during client navigation for the home route, the home page demonstrates a progressively enhanced `POST` form with `useSubmit()`, and server routes execute as `sevok` invocation contexts so handlers can call `ctx.request`, `ctx.get(...)`, or `ctx.waitUntil(...)`.
 
@@ -25,11 +25,11 @@ This example shows the current smallest working `phial` app with file routes, no
 - `server/routes/api/_middleware.ts`: directory-scoped server middleware declaration by name
 - `server/routes/api/ping.ts`: file-based server route with `GET` and `POST`
 - `server/routes/robots.txt.ts`: plain text server route
-- `phial.config.ts`: declares dev defaults and global `server.middleware`
+- `vuloom.config.ts`: declares dev defaults and global `server.middleware`
 
 ## Run
 
-From `repos/phial`:
+From `repos/vuloom`:
 
 ```bash
 pnpm example:zero-config
@@ -37,7 +37,7 @@ pnpm example:zero-config
 
 Then open `http://localhost:3000`.
 
-The example imports `phial` by package name, so building first ensures `dist/` is available inside this repository checkout. The CLI then starts Vite, loads `phial` and `phial/vite` through Phial-owned generated virtual modules, and injects the default client runtime for you.
+The example imports `vuloom` by package name, so building first ensures `dist/` is available inside this repository checkout. The CLI then starts Vite, loads `vuloom` and `vuloom/vite` through Vuloom-owned generated virtual modules, and injects the default client runtime for you.
 
 For a production asset build from the package root:
 
@@ -47,6 +47,6 @@ pnpm exec tsx src/bin.ts build examples/zero-config
 pnpm exec tsx src/bin.ts start examples/zero-config
 ```
 
-`phial prepare` writes `.phial/types/middleware.d.ts` and `.phial/types/routes.d.ts`. Those power middleware-name autocomplete plus the generated app-route path/id/params types derived from `app/pages/`.
+`vuloom prepare` writes `.vuloom/types/middleware.d.ts` and `.vuloom/types/routes.d.ts`. Those power middleware-name autocomplete plus the generated app-route path/id/params types derived from `app/pages/`.
 
-`server/routes` owns raw HTTP paths outright. If a `server/routes` pattern overlaps with an `app/pages` pattern, Phial will fail scanning instead of trying to split ownership by method.
+`server/routes` owns raw HTTP paths outright. If a `server/routes` pattern overlaps with an `app/pages` pattern, Vuloom will fail scanning instead of trying to split ownership by method.

@@ -33,7 +33,7 @@ export default defineComponent({
               "display: flex; gap: 16px; align-items: center; margin-bottom: 32px; flex-wrap: wrap;",
           },
           [
-            h("strong", null, "phial"),
+            h("strong", null, "vuloom"),
             h(
               RouterLink,
               { to: "/" },

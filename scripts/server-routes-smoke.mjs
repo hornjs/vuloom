@@ -33,9 +33,9 @@ async function main() {
 async function verifyGeneratedMiddlewareTypes() {
   await runCommand("pnpm", ["exec", "tsx", "src/bin.ts", "prepare", "examples/zero-config"]);
 
-  const typesFile = resolve(PACKAGE_ROOT, "examples/zero-config/.phial/types/middleware.d.ts");
+  const typesFile = resolve(PACKAGE_ROOT, "examples/zero-config/.vuloom/types/middleware.d.ts");
   const source = await readFile(typesFile, "utf8");
-  const routeTypesFile = resolve(PACKAGE_ROOT, "examples/zero-config/.phial/types/routes.d.ts");
+  const routeTypesFile = resolve(PACKAGE_ROOT, "examples/zero-config/.vuloom/types/routes.d.ts");
   const routeSource = await readFile(routeTypesFile, "utf8");
 
   for (const expected of ['"blog-trace": true', '"post-trace": true', '"request-meta": true']) {
@@ -45,7 +45,7 @@ async function verifyGeneratedMiddlewareTypes() {
   }
 
   for (const expected of [
-    "declare module 'phial' {",
+    "declare module 'vuloom' {",
     "interface AppDataRegistry {",
     '"/": {}',
     '"/blog/:slug": {',
@@ -66,7 +66,7 @@ async function verifyGeneratedMiddlewareTypes() {
 async function verifyExampleProjectTypes() {
   const typecheckConfigFile = resolve(
     PACKAGE_ROOT,
-    "examples/zero-config/.phial/tsconfig.typecheck.json",
+    "examples/zero-config/.vuloom/tsconfig.typecheck.json",
   );
 
   await runCommand("pnpm", ["exec", "vue-tsc", "--noEmit", "-p", typecheckConfigFile]);
@@ -183,7 +183,7 @@ async function assertServerRoutes(baseUrl) {
 }
 
 async function verifyPathConflictDetection() {
-  const root = await createTempProject("phial-path-conflict-");
+  const root = await createTempProject("vuloom-path-conflict-");
 
   try {
     await writeProjectFiles(root, {
@@ -226,7 +226,7 @@ async function verifyPathConflictDetection() {
 }
 
 async function verifyAmbiguousServerRouteDetection() {
-  const root = await createTempProject("phial-ambiguous-server-route-");
+  const root = await createTempProject("vuloom-ambiguous-server-route-");
 
   try {
     await writeProjectFiles(root, {

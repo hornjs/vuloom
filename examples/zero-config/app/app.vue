@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useAppData } from "phial/app";
+import { useAppData } from "vuloom/app";
 
 interface AppData {
   theme: "light" | "sepia";
@@ -19,7 +19,7 @@ const bodyStyle = computed(() =>
 <template>
   <html lang="en" data-allow-mismatch="children">
     <head data-allow-mismatch="children">
-      <title>phial</title>
+      <title>vuloom</title>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>

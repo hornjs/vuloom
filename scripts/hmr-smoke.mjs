@@ -36,7 +36,7 @@ async function main() {
     });
 
     await page.addInitScript(() => {
-      window.__phialHmrProbeLoads = (window.__phialHmrProbeLoads || 0) + 1;
+      window.__vuloomHmrProbeLoads = (window.__vuloomHmrProbeLoads || 0) + 1;
     });
 
     await page.goto(DEV_URL, {
@@ -138,7 +138,7 @@ async function waitForHomePage(page) {
 }
 
 async function readLoadCount(page) {
-  return page.evaluate(() => window.__phialHmrProbeLoads ?? 0);
+  return page.evaluate(() => window.__vuloomHmrProbeLoads ?? 0);
 }
 
 function startDevServer() {
@@ -167,7 +167,7 @@ function startDevServer() {
 
     child.stdout.on("data", (chunk) => {
       process.stdout.write(`[dev] ${chunk}`);
-      if (!resolved && chunk.includes(`phial dev server: ${DEV_URL}`)) {
+      if (!resolved && chunk.includes(`vuloom dev server: ${DEV_URL}`)) {
         resolved = true;
         clearTimeout(startupTimeout);
         resolveReady();
