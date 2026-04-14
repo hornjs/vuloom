@@ -3,25 +3,25 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { DEFAULT_CLIENT_BUILD_OUT_DIR, DEFAULT_SERVER_BUILD_OUT_DIR } from "./plugin-build";
-import { loadPhialConfig, type LoadPhialConfigOptions } from "../config";
+import { loadVuloomConfig, type LoadVuloomConfigOptions } from "../config";
 
-export interface PhialStartServerOptions extends LoadPhialConfigOptions {
+export interface VuloomStartServerOptions extends LoadVuloomConfigOptions {
   host?: string;
   port?: number;
   root?: string;
   adapter?: RuntimeAdapter;
 }
 
-export interface PhialStartServerHandle {
+export interface VuloomStartServerHandle {
   server: Server;
   url: string;
   close(): Promise<void>;
 }
 
-export async function startPhialServer(
-  options: PhialStartServerOptions = {},
-): Promise<PhialStartServerHandle> {
-  const loadedConfig = await loadPhialConfig({
+export async function startVuloomServer(
+  options: VuloomStartServerOptions = {},
+): Promise<VuloomStartServerHandle> {
+  const loadedConfig = await loadVuloomConfig({
     root: options.root,
     configFile: options.configFile,
     command: "serve",
@@ -75,7 +75,7 @@ async function resolveBuiltClientEntryPath(clientOutDir: string): Promise<string
   const manifestSource = await readFile(manifestFile, "utf8").catch(() => null);
 
   if (!manifestSource) {
-    throw new Error(`Missing Phial build manifest: ${manifestFile}. Run "phial build" first.`);
+    throw new Error(`Missing Vuloom build manifest: ${manifestFile}. Run "vuloom build" first.`);
   }
 
   const manifest = JSON.parse(manifestSource) as Record<
@@ -90,11 +90,11 @@ async function resolveBuiltClientEntryPath(clientOutDir: string): Promise<string
   const clientEntry = Object.values(manifest).find(
     (entry) =>
       entry.isEntry &&
-      (entry.name === "client-entry" || entry.src?.includes("virtual:phial-client-entry")),
+      (entry.name === "client-entry" || entry.src?.includes("virtual:vuloom-client-entry")),
   );
 
   if (!clientEntry?.file) {
-    throw new Error(`Unable to resolve Phial client entry from manifest: ${manifestFile}`);
+    throw new Error(`Unable to resolve Vuloom client entry from manifest: ${manifestFile}`);
   }
 
   return `/${clientEntry.file}`;
@@ -105,7 +105,7 @@ function resolveCreateServerApp(serverModule: Record<string, unknown>): CreateSe
 
   if (typeof candidate !== "function") {
     throw new Error(
-      `Invalid Phial server bundle. Expected a createServerApp export in ${DEFAULT_SERVER_BUILD_OUT_DIR}/index.js.`,
+      `Invalid Vuloom server bundle. Expected a createServerApp export in ${DEFAULT_SERVER_BUILD_OUT_DIR}/index.js.`,
     );
   }
 

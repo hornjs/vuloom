@@ -1,4 +1,4 @@
-declare namespace PhialGeneratedTypes {
+declare namespace VuloomGeneratedTypes {
   type PageMiddleware = import("vuepagelet/integration").PageMiddleware;
   type LoaderContext = import("vuepagelet/integration").LoaderContext;
   type ActionContext = import("vuepagelet/integration").ActionContext;
@@ -58,7 +58,7 @@ declare namespace PhialGeneratedTypes {
   type ServerMiddleware = import("sevok").ServerMiddleware;
   type ServerMethodHandlers = import("sevok").ServerMethodHandlers;
 
-  // Extend sevok's ServerMethodHandlers to add phial-specific fields
+  // Extend sevok's ServerMethodHandlers to add vuloom-specific fields
   interface ServerRouteDefinition extends ServerMethodHandlers {
     middleware?: readonly import("sevok").ServerMiddleware[];
     meta?: Record<string, unknown>;
@@ -75,96 +75,96 @@ declare namespace PhialGeneratedTypes {
   }
 }
 
-declare module "phial/generated-routes-manifest" {
-  export const manifest: PhialGeneratedTypes.RouteManifestEntry[];
+declare module "vuloom/generated-routes-manifest" {
+  export const manifest: VuloomGeneratedTypes.RouteManifestEntry[];
   export default manifest;
 }
 
-declare module "phial/generated-routes-modules" {
-  export interface PhialGeneratedRouteModuleExports {
+declare module "vuloom/generated-routes-modules" {
+  export interface VuloomGeneratedRouteModuleExports {
     default?: unknown;
-    directoryMiddleware?: PhialGeneratedTypes.PageMiddleware[];
-    loader?: (context: PhialGeneratedTypes.LoaderContext) => unknown | Promise<unknown>;
-    action?: (context: PhialGeneratedTypes.ActionContext) => unknown | Promise<unknown>;
-    middleware?: PhialGeneratedTypes.PageMiddleware[];
-    shouldRevalidate?: (args: PhialGeneratedTypes.ShouldRevalidateArgs) => boolean;
+    directoryMiddleware?: VuloomGeneratedTypes.PageMiddleware[];
+    loader?: (context: VuloomGeneratedTypes.LoaderContext) => unknown | Promise<unknown>;
+    action?: (context: VuloomGeneratedTypes.ActionContext) => unknown | Promise<unknown>;
+    middleware?: VuloomGeneratedTypes.PageMiddleware[];
+    shouldRevalidate?: (args: VuloomGeneratedTypes.ShouldRevalidateArgs) => boolean;
     meta?: unknown;
     ErrorBoundary?: unknown;
     Loading?: unknown;
     onError?: (error: unknown) => unknown;
   }
 
-  export type PhialGeneratedRouteModuleImporter = () => Promise<
-    PhialGeneratedRouteModuleExports | undefined
+  export type VuloomGeneratedRouteModuleImporter = () => Promise<
+    VuloomGeneratedRouteModuleExports | undefined
   >;
-  export type PhialGeneratedRouteModules =
-    | Record<string, PhialGeneratedRouteModuleExports | undefined>
-    | Record<string, PhialGeneratedRouteModuleImporter>;
+  export type VuloomGeneratedRouteModules =
+    | Record<string, VuloomGeneratedRouteModuleExports | undefined>
+    | Record<string, VuloomGeneratedRouteModuleImporter>;
 
   export const routeFiles: Record<string, string[]>;
-  export const routeModules: PhialGeneratedRouteModules;
+  export const routeModules: VuloomGeneratedRouteModules;
   export function loadRouteModule(
     id: string,
   ):
-    | PhialGeneratedRouteModuleExports
-    | Promise<PhialGeneratedRouteModuleExports | undefined>
+    | VuloomGeneratedRouteModuleExports
+    | Promise<VuloomGeneratedRouteModuleExports | undefined>
     | undefined;
   export default routeModules;
 }
 
-declare module "phial/generated-app-runtime" {
-  export const appLoader: PhialGeneratedTypes.AppModule["loader"];
-  export const app: PhialGeneratedTypes.RouteRuntimeIntegration["app"];
-  export const routes: PhialGeneratedTypes.RouteRuntimeIntegration["routes"];
+declare module "vuloom/generated-app-runtime" {
+  export const appLoader: VuloomGeneratedTypes.AppModule["loader"];
+  export const app: VuloomGeneratedTypes.RouteRuntimeIntegration["app"];
+  export const routes: VuloomGeneratedTypes.RouteRuntimeIntegration["routes"];
   export function createIntegration(
-    runtimeOptions?: Partial<PhialGeneratedTypes.CreateRouteRuntimeIntegrationOptions>,
-  ): PhialGeneratedTypes.RouteRuntimeIntegration;
-  export const integration: PhialGeneratedTypes.RouteRuntimeIntegration;
-  const runtime: PhialGeneratedTypes.RouteRuntimeIntegration;
+    runtimeOptions?: Partial<VuloomGeneratedTypes.CreateRouteRuntimeIntegrationOptions>,
+  ): VuloomGeneratedTypes.RouteRuntimeIntegration;
+  export const integration: VuloomGeneratedTypes.RouteRuntimeIntegration;
+  const runtime: VuloomGeneratedTypes.RouteRuntimeIntegration;
   export default runtime;
 }
 
-declare module "phial/generated-app-loader" {
-  export const appLoader: PhialGeneratedTypes.AppModule["loader"] | undefined;
+declare module "vuloom/generated-app-loader" {
+  export const appLoader: VuloomGeneratedTypes.AppModule["loader"] | undefined;
   export default appLoader;
 }
 
-declare module "phial/generated-app-middleware" {
-  export const appMiddlewareRegistry: Record<string, PhialGeneratedTypes.PageMiddleware>;
+declare module "vuloom/generated-app-middleware" {
+  export const appMiddlewareRegistry: Record<string, VuloomGeneratedTypes.PageMiddleware>;
   export default appMiddlewareRegistry;
 }
 
-declare module "phial/generated-app-plugin" {
-  export interface PhialCreateAppPluginOptions {
+declare module "vuloom/generated-app-plugin" {
+  export interface VuloomCreateAppPluginOptions {
     clientEntryPath?: string;
   }
 
   export function createAppPlugin(
-    options?: PhialCreateAppPluginOptions,
-  ): PhialGeneratedTypes.ServerMiddlewareFunction;
-  export const appPlugin: PhialGeneratedTypes.ServerMiddlewareFunction;
+    options?: VuloomCreateAppPluginOptions,
+  ): VuloomGeneratedTypes.ServerMiddlewareFunction;
+  export const appPlugin: VuloomGeneratedTypes.ServerMiddlewareFunction;
   export default createAppPlugin;
 }
 
-declare module "phial/generated-server-routes" {
-  export const serverRoutes: PhialGeneratedTypes.ServerRouteRecord[];
-  export const serverMiddlewareRegistry: Record<string, PhialGeneratedTypes.ServerMiddleware>;
+declare module "vuloom/generated-server-routes" {
+  export const serverRoutes: VuloomGeneratedTypes.ServerRouteRecord[];
+  export const serverMiddlewareRegistry: Record<string, VuloomGeneratedTypes.ServerMiddleware>;
   export default serverRoutes;
 }
 
-declare module "phial/generated-server-middleware" {
-  export const serverMiddlewareRegistry: Record<string, PhialGeneratedTypes.ServerMiddleware>;
+declare module "vuloom/generated-server-middleware" {
+  export const serverMiddlewareRegistry: Record<string, VuloomGeneratedTypes.ServerMiddleware>;
   export default serverMiddlewareRegistry;
 }
 
-declare module "phial/generated-server-plugin" {
-  export function createServerPlugin(): PhialGeneratedTypes.ServerMiddlewareFunction;
-  export const serverPlugin: PhialGeneratedTypes.ServerMiddlewareFunction;
+declare module "vuloom/generated-server-plugin" {
+  export function createServerPlugin(): VuloomGeneratedTypes.ServerMiddlewareFunction;
+  export const serverPlugin: VuloomGeneratedTypes.ServerMiddlewareFunction;
   export default createServerPlugin;
 }
 
-declare module "phial/generated-config" {
+declare module "vuloom/generated-config" {
   export const hasConfig: boolean;
-  export const config: PhialGeneratedTypes.Config;
+  export const config: VuloomGeneratedTypes.Config;
   export default config;
 }

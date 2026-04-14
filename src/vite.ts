@@ -1,4 +1,4 @@
-// Phial Vite 插件入口
-export { phial } from "./lib/vite";
-export type { PhialOptions } from "./lib/vite";
+// Vuloom Vite 插件入口
+export { vuloom } from "./lib/vite";
+export type { VuloomOptions } from "./lib/vite";
 export { defineConfig } from "./lib/config";

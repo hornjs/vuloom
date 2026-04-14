@@ -1,11 +1,11 @@
 import { basename, extname, relative, resolve } from "node:path";
 import type { Plugin, ResolvedConfig, ViteDevServer } from "vite";
-import type { PhialPluginOptions } from "../config";
-import { isPhialConfigFile, loadPhialConfig, type LoadedPhialConfig } from "../config";
+import type { VuloomPluginOptions } from "../config";
+import { isVuloomConfigFile, loadVuloomConfig, type LoadedVuloomConfig } from "../config";
 import { createClientEntryModule } from "./generated/client-entry";
 import { scanRoutes } from "./scanners/routes-scanner";
 import type { ScannedRoutesResult } from "./scanners/route-manifest";
-import { writePhialProjectTypes } from "./scanners/types-generator";
+import { writeVuloomProjectTypes } from "./scanners/types-generator";
 import {
   createVirtualAppLoaderModule,
   createVirtualAppMiddlewareModule,
@@ -33,13 +33,13 @@ import {
   resolveVirtualModuleId,
 } from "./generated/virtual-modules";
 
-export interface PhialOptions extends PhialPluginOptions {}
-export const DEFAULT_CLIENT_ENTRY_PUBLIC_PATH = "/@phial/client-entry.js";
+export interface VuloomOptions extends VuloomPluginOptions {}
+export const DEFAULT_CLIENT_ENTRY_PUBLIC_PATH = "/@vuloom/client-entry.js";
 
-export function phial(options: PhialOptions = {}): Plugin {
+export function vuloom(options: VuloomOptions = {}): Plugin {
   let viteConfig: ResolvedConfig | null = null;
   let scannedRoutesPromise: Promise<ScannedRoutesResult> | null = null;
-  let phialConfigPromise: Promise<LoadedPhialConfig> | null = null;
+  let vuloomConfigPromise: Promise<LoadedVuloomConfig> | null = null;
   let watcherReady = false;
   let refreshPromise: Promise<void> | null = null;
   let refreshRequested = false;
@@ -47,15 +47,15 @@ export function phial(options: PhialOptions = {}): Plugin {
   let refreshNeedsFullReload = false;
 
   return {
-    name: "phial:routes",
+    name: "vuloom:routes",
     enforce: "pre",
     configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;
       scannedRoutesPromise = null;
-      phialConfigPromise = null;
+      vuloomConfigPromise = null;
     },
     async buildStart() {
-      await Promise.all([getScannedRoutes(), getPhialConfig()]);
+      await Promise.all([getScannedRoutes(), getVuloomConfig()]);
     },
     resolveId(id) {
       return resolveVirtualModuleId(id);
@@ -67,11 +67,11 @@ export function phial(options: PhialOptions = {}): Plugin {
       }
 
       if (resolvedId === RESOLVED_GENERATED_CONFIG_ID) {
-        const phialConfig = await getPhialConfig();
+        const vuloomConfig = await getVuloomConfig();
 
         return createVirtualConfigModule({
-          config: phialConfig.config as Record<string, unknown>,
-          hasConfigFile: Boolean(phialConfig.file),
+          config: vuloomConfig.config as Record<string, unknown>,
+          hasConfigFile: Boolean(vuloomConfig.file),
         });
       }
 
@@ -151,10 +151,10 @@ export function phial(options: PhialOptions = {}): Plugin {
 
             scannedRoutesPromise = null;
             if (reloadConfig) {
-              phialConfigPromise = null;
+              vuloomConfigPromise = null;
             }
 
-            await getPhialConfig();
+            await getVuloomConfig();
             await getScannedRoutes();
             invalidateVirtualModules(server);
 
@@ -176,20 +176,20 @@ export function phial(options: PhialOptions = {}): Plugin {
 
         const scannedAppFile = await isScannedAppFile(file);
         const scannedServerFile = await isScannedServerFile(file);
-        const phialConfigFile = isPhialConfigFile(file);
+        const vuloomConfigFile = isVuloomConfigFile(file);
 
-        if (!scannedAppFile && !scannedServerFile && !phialConfigFile) {
+        if (!scannedAppFile && !scannedServerFile && !vuloomConfigFile) {
           return;
         }
 
         await scheduleRefresh({
-          configReload: phialConfigFile,
-          fullReload: scannedAppFile || phialConfigFile,
+          configReload: vuloomConfigFile,
+          fullReload: scannedAppFile || vuloomConfigFile,
         });
       };
 
       const handleConfigChange = async (file: string) => {
-        if (!watcherReady || !isPhialConfigFile(file)) {
+        if (!watcherReady || !isVuloomConfigFile(file)) {
           return;
         }
 
@@ -238,15 +238,15 @@ export function phial(options: PhialOptions = {}): Plugin {
       serverMiddlewareDir: resolvedOptions.serverMiddlewareDir,
       extensions: resolvedOptions.extensions,
     }).then(async (result) => {
-      await writePhialProjectTypes(result);
+      await writeVuloomProjectTypes(result);
       return result;
     });
 
     return scannedRoutesPromise;
   }
 
-  async function getPhialConfig(): Promise<LoadedPhialConfig> {
-    phialConfigPromise ??= loadPhialConfig({
+  async function getVuloomConfig(): Promise<LoadedVuloomConfig> {
+    vuloomConfigPromise ??= loadVuloomConfig({
       root: options.root ?? viteConfig?.root,
       command: viteConfig?.command ?? "serve",
       mode: viteConfig?.mode,
@@ -255,18 +255,18 @@ export function phial(options: PhialOptions = {}): Plugin {
       logLevel: viteConfig?.logLevel,
     });
 
-    return phialConfigPromise;
+    return vuloomConfigPromise;
   }
 
-  async function getResolvedOptions(): Promise<PhialOptions> {
-    const phialConfig = await getPhialConfig();
-    const configuredOptions = phialConfig.config.plugin ?? {};
+  async function getResolvedOptions(): Promise<VuloomOptions> {
+    const vuloomConfig = await getVuloomConfig();
+    const configuredOptions = vuloomConfig.config.plugin ?? {};
     const appDir = options.appDir ?? configuredOptions.appDir ?? "app";
 
     return {
       ...configuredOptions,
       ...options,
-      root: options.root ?? configuredOptions.root ?? phialConfig.configRoot,
+      root: options.root ?? configuredOptions.root ?? vuloomConfig.configRoot,
       appDir,
       routesDir: options.routesDir ?? configuredOptions.routesDir ?? `${appDir}/pages`,
       serverRoutesDir:

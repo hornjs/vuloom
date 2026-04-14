@@ -1,18 +1,18 @@
 import type { ScannedRouteModule, ScannedRoutesResult } from "../scanners/route-manifest";
 
-export const VIRTUAL_ROUTES_MANIFEST_ID = "virtual:phial-routes-manifest";
-export const VIRTUAL_ROUTES_MODULES_ID = "virtual:phial-routes-modules";
-export const VIRTUAL_APP_RUNTIME_ID = "virtual:phial-app-runtime";
-export const GENERATED_ROUTES_MANIFEST_ID = "phial/generated-routes-manifest";
-export const GENERATED_ROUTES_MODULES_ID = "phial/generated-routes-modules";
-export const GENERATED_APP_RUNTIME_ID = "phial/generated-app-runtime";
-export const GENERATED_APP_LOADER_ID = "phial/generated-app-loader";
-export const GENERATED_APP_MIDDLEWARE_ID = "phial/generated-app-middleware";
-export const GENERATED_APP_PLUGIN_ID = "phial/generated-app-plugin";
-export const GENERATED_SERVER_ROUTES_ID = "phial/generated-server-routes";
-export const GENERATED_SERVER_MIDDLEWARE_ID = "phial/generated-server-middleware";
-export const GENERATED_SERVER_PLUGIN_ID = "phial/generated-server-plugin";
-export const GENERATED_CONFIG_ID = "phial/generated-config";
+export const VIRTUAL_ROUTES_MANIFEST_ID = "virtual:vuloom-routes-manifest";
+export const VIRTUAL_ROUTES_MODULES_ID = "virtual:vuloom-routes-modules";
+export const VIRTUAL_APP_RUNTIME_ID = "virtual:vuloom-app-runtime";
+export const GENERATED_ROUTES_MANIFEST_ID = "vuloom/generated-routes-manifest";
+export const GENERATED_ROUTES_MODULES_ID = "vuloom/generated-routes-modules";
+export const GENERATED_APP_RUNTIME_ID = "vuloom/generated-app-runtime";
+export const GENERATED_APP_LOADER_ID = "vuloom/generated-app-loader";
+export const GENERATED_APP_MIDDLEWARE_ID = "vuloom/generated-app-middleware";
+export const GENERATED_APP_PLUGIN_ID = "vuloom/generated-app-plugin";
+export const GENERATED_SERVER_ROUTES_ID = "vuloom/generated-server-routes";
+export const GENERATED_SERVER_MIDDLEWARE_ID = "vuloom/generated-server-middleware";
+export const GENERATED_SERVER_PLUGIN_ID = "vuloom/generated-server-plugin";
+export const GENERATED_CONFIG_ID = "vuloom/generated-config";
 export const RESOLVED_VIRTUAL_ROUTES_MANIFEST_ID = `\0${VIRTUAL_ROUTES_MANIFEST_ID}`;
 export const RESOLVED_VIRTUAL_ROUTES_MODULES_ID = `\0${VIRTUAL_ROUTES_MODULES_ID}`;
 export const RESOLVED_VIRTUAL_APP_RUNTIME_ID = `\0${VIRTUAL_APP_RUNTIME_ID}`;
@@ -831,7 +831,7 @@ function createDynamicRouteModulesModule(result: ScannedRoutesResult): string {
     "  }",
     "",
     "  const loadedModules = await Promise.all(definition.files.map(file => import(file)))",
-    "  return createPhialRouteModule(definition, loadedModules)",
+    "  return createVuloomRouteModule(definition, loadedModules)",
     "}",
     "",
     ...createRouteModuleHelperLines(),
@@ -906,7 +906,7 @@ function createEagerRouteModulesModule(result: ScannedRoutesResult): string {
     "  }",
     "",
     "  const loadedModules = definition.files.map((file) => getLoadedRouteFileModule(file))",
-    "  return createPhialRouteModule(definition, loadedModules)",
+    "  return createVuloomRouteModule(definition, loadedModules)",
     "}",
     "",
     "function getLoadedRouteFileModule(file) {",
@@ -1029,7 +1029,7 @@ function createRouteDefinition(module: ScannedRouteModule): string {
 
 function createRouteModuleHelperLines(): string[] {
   return [
-    "function createPhialRouteModule(definition, loadedModules) {",
+    "function createVuloomRouteModule(definition, loadedModules) {",
     "  const modules = Object.fromEntries(definition.files.map((file, index) => [file, loadedModules[index]]))",
     "  const primaryModule = resolvePrimaryModule(definition, modules)",
     '  const errorModule = resolveEntryModule(definition, modules, "error")',

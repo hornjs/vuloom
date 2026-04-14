@@ -167,7 +167,7 @@ export function assertServerRouteConflicts(
       }
 
       throw new Error(
-        `Server route "${serverRoute.path}" from ${serverRoute.file} conflicts with app page path "${appPath}". Phial does not split path ownership between app/pages and server/routes, even across different HTTP methods.`,
+        `Server route "${serverRoute.path}" from ${serverRoute.file} conflicts with app page path "${appPath}". Vuloom does not split path ownership between app/pages and server/routes, even across different HTTP methods.`,
       );
     }
   }

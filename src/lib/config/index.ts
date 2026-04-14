@@ -8,25 +8,25 @@ import {
   type LogLevel,
 } from "vite";
 
-export const DEFAULT_PHIAL_CONFIG_FILES = [
-  "phial.config.ts",
-  "phial.config.mts",
-  "phial.config.js",
-  "phial.config.mjs",
-  "phial.config.cts",
-  "phial.config.cjs",
+export const DEFAULT_VULOOM_CONFIG_FILES = [
+  "vuloom.config.ts",
+  "vuloom.config.mts",
+  "vuloom.config.js",
+  "vuloom.config.mjs",
+  "vuloom.config.cts",
+  "vuloom.config.cjs",
 ] as const;
 
-export interface PhialDevConfig {
+export interface VuloomDevConfig {
   host?: string;
   port?: number;
 }
 
-export interface PhialServerConfig {
+export interface VuloomServerConfig {
   middleware?: readonly string[];
 }
 
-export interface PhialPluginOptions {
+export interface VuloomPluginOptions {
   root?: string;
   appDir?: string;
   extensions?: string[];
@@ -36,26 +36,26 @@ export interface PhialPluginOptions {
   moduleImportMode?: "dynamic" | "eager";
 }
 
-export interface PhialAppConfig {
+export interface VuloomAppConfig {
   middlewares?: readonly string[];
   dataQueryParam?: string;
   injectClientEntry?: boolean;
   clientEntryPath?: string;
 }
 
-export interface PhialConfig {
+export interface VuloomConfig {
   root?: string;
-  app?: PhialAppConfig;
-  server?: PhialServerConfig;
-  dev?: PhialDevConfig;
+  app?: VuloomAppConfig;
+  server?: VuloomServerConfig;
+  dev?: VuloomDevConfig;
   vite?: InlineConfig;
-  plugin?: PhialPluginOptions;
+  plugin?: VuloomPluginOptions;
 }
 
 /**
  * Config environment passed to config functions
  */
-export interface PhialConfigEnv {
+export interface VuloomConfigEnv {
   command: "build" | "serve";
   mode: string;
   isSsrBuild: boolean;
@@ -65,11 +65,11 @@ export interface PhialConfigEnv {
 /**
  * Config can be a static object or a function that returns a config (or Promise)
  */
-export type PhialConfigExport =
-  | PhialConfig
-  | ((env: PhialConfigEnv) => PhialConfig | Promise<PhialConfig>);
+export type VuloomConfigExport =
+  | VuloomConfig
+  | ((env: VuloomConfigEnv) => VuloomConfig | Promise<VuloomConfig>);
 
-export interface LoadPhialConfigOptions {
+export interface LoadVuloomConfigOptions {
   root?: string;
   configFile?: string;
   command?: ConfigEnv["command"];
@@ -79,26 +79,26 @@ export interface LoadPhialConfigOptions {
   logLevel?: LogLevel;
 }
 
-export interface LoadedPhialConfig {
+export interface LoadedVuloomConfig {
   file?: string;
   searchRoot: string;
   configRoot: string;
-  config: PhialConfig;
-  env: Required<Pick<LoadPhialConfigOptions, "command" | "mode" | "isSsrBuild" | "isPreview">>;
+  config: VuloomConfig;
+  env: Required<Pick<LoadVuloomConfigOptions, "command" | "mode" | "isSsrBuild" | "isPreview">>;
 }
 
 /**
- * Define phial configuration
+ * Define vuloom configuration
  * Accepts a static config object or a function that receives config env
  * Function can return config synchronously or asynchronously
  */
-export function defineConfig(config: PhialConfigExport): PhialConfigExport {
+export function defineConfig(config: VuloomConfigExport): VuloomConfigExport {
   return config;
 }
 
-export async function loadPhialConfig(
-  options: LoadPhialConfigOptions = {},
-): Promise<LoadedPhialConfig> {
+export async function loadVuloomConfig(
+  options: LoadVuloomConfigOptions = {},
+): Promise<LoadedVuloomConfig> {
   const searchRoot = resolve(options.root ?? process.cwd());
   const env = {
     command: options.command ?? "serve",
@@ -118,7 +118,7 @@ export async function loadPhialConfig(
   }
 
   const loaded = await loadConfigFromFile(env, configFile, searchRoot, options.logLevel ?? "error");
-  const rawConfig = (loaded?.config ?? {}) as PhialConfigExport;
+  const rawConfig = (loaded?.config ?? {}) as VuloomConfigExport;
 
   // Support function config (sync or async)
   const config = await (typeof rawConfig === "function"
@@ -134,9 +134,9 @@ export async function loadPhialConfig(
   };
 }
 
-export function isPhialConfigFile(file: string): boolean {
+export function isVuloomConfigFile(file: string): boolean {
   const normalized = normalizePath(file);
-  return DEFAULT_PHIAL_CONFIG_FILES.some(
+  return DEFAULT_VULOOM_CONFIG_FILES.some(
     (configFile) => normalized.endsWith(`/${configFile}`) || normalized === configFile,
   );
 }
@@ -147,7 +147,7 @@ function resolveConfigFile(root: string, configFile?: string): string | undefine
     return existsSync(resolved) ? resolved : undefined;
   }
 
-  return DEFAULT_PHIAL_CONFIG_FILES.map((file) => resolve(root, file)).find((file) =>
+  return DEFAULT_VULOOM_CONFIG_FILES.map((file) => resolve(root, file)).find((file) =>
     existsSync(file),
   );
 }

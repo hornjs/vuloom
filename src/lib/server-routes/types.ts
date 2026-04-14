@@ -21,7 +21,7 @@ export interface ScannedServerRuntimeInput {
 export type ServerRouteHandler = ServerHandler;
 export type { ServerMiddleware, ServerMethodHandlers };
 
-// Extend sevok's ServerMethodHandlers to add phial-specific fields
+// Extend sevok's ServerMethodHandlers to add vuloom-specific fields
 export interface ServerRouteDefinition extends ServerMethodHandlers {
   middleware?: readonly ServerMiddleware[];
   meta?: Record<string, unknown>;

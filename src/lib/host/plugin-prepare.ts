@@ -1,17 +1,17 @@
-import { loadPhialConfig } from "../config/index.ts";
+import { loadVuloomConfig } from "../config/index.ts";
 import { scanRoutes } from "../vite/scanners/routes-scanner";
-import { writePhialProjectTypes, type GeneratedPhialTypesResult } from "../vite/scanners/types-generator";
+import { writeVuloomProjectTypes, type GeneratedVuloomTypesResult } from "../vite/scanners/types-generator";
 
-export interface PhialPrepareOptions {
+export interface VuloomPrepareOptions {
   root?: string;
   configFile?: string;
   mode?: string;
 }
 
-export async function preparePhialApp(
-  options: PhialPrepareOptions = {},
-): Promise<GeneratedPhialTypesResult> {
-  const loadedConfig = await loadPhialConfig({
+export async function prepareVuloomApp(
+  options: VuloomPrepareOptions = {},
+): Promise<GeneratedVuloomTypesResult> {
+  const loadedConfig = await loadVuloomConfig({
     root: options.root,
     configFile: options.configFile,
     command: "serve",
@@ -31,5 +31,5 @@ export async function preparePhialApp(
     extensions: configuredOptions.extensions,
   });
 
-  return writePhialProjectTypes(scannedRoutes);
+  return writeVuloomProjectTypes(scannedRoutes, loadedConfig.file);
 }

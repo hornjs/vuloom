@@ -1,13 +1,13 @@
 import { resolve } from "node:path";
 import process from "node:process";
 import {
-  buildPhialApp,
-  preparePhialApp,
-  startPhialDevServer,
-  startPhialServer,
+  buildVuloomApp,
+  prepareVuloomApp,
+  startVuloomDevServer,
+  startVuloomServer,
 } from "./host";
 
-export async function runPhialCli(argv: string[] = process.argv.slice(2)): Promise<number> {
+export async function runVuloomCli(argv: string[] = process.argv.slice(2)): Promise<number> {
   const args = [...argv];
   const command = args.shift();
 
@@ -18,9 +18,9 @@ export async function runPhialCli(argv: string[] = process.argv.slice(2)): Promi
 
   if (command === "dev") {
     const options = parseSharedOptions(args);
-    const handle = await startPhialDevServer(options);
+    const handle = await startVuloomDevServer(options);
 
-    console.log(`phial dev server: ${handle.url}`);
+    console.log(`vuloom dev server: ${handle.url}`);
     registerShutdown(async () => {
       await handle.close();
       process.exit(0);
@@ -30,22 +30,22 @@ export async function runPhialCli(argv: string[] = process.argv.slice(2)): Promi
 
   if (command === "build") {
     const options = parseSharedOptions(args);
-    await buildPhialApp(options);
+    await buildVuloomApp(options);
     return 0;
   }
 
   if (command === "prepare") {
     const options = parseSharedOptions(args);
-    const result = await preparePhialApp(options);
-    console.log(`phial prepare: wrote ${result.middlewareFile}`);
+    const result = await prepareVuloomApp(options);
+    console.log(`vuloom prepare: wrote ${result.middlewareFile}`);
     return 0;
   }
 
   if (command === "start") {
     const options = parseSharedOptions(args);
-    const handle = await startPhialServer(options);
+    const handle = await startVuloomServer(options);
 
-    console.log(`phial server: ${handle.url}`);
+    console.log(`vuloom server: ${handle.url}`);
     registerShutdown(async () => {
       await handle.close();
       process.exit(0);
@@ -120,13 +120,13 @@ function registerShutdown(shutdown: () => Promise<void>) {
 }
 
 function printUsage() {
-  console.log("Usage: phial <command> [root] [--config phial.config.ts] [--mode production]");
+  console.log("Usage: vuloom <command> [root] [--config vuloom.config.ts] [--mode production]");
   console.log("");
   console.log("Commands:");
-  console.log("  phial dev [root] [--port 3000] [--host 0.0.0.0] [--config phial.config.ts]");
-  console.log("  phial build [root] [--watch] [--config phial.config.ts] [--mode production]");
-  console.log("  phial prepare [root] [--config phial.config.ts] [--mode development]");
+  console.log("  vuloom dev [root] [--port 3000] [--host 0.0.0.0] [--config vuloom.config.ts]");
+  console.log("  vuloom build [root] [--watch] [--config vuloom.config.ts] [--mode production]");
+  console.log("  vuloom prepare [root] [--config vuloom.config.ts] [--mode development]");
   console.log(
-    "  phial start [root] [--port 3000] [--host 0.0.0.0] [--config phial.config.ts] [--mode production]",
+    "  vuloom start [root] [--port 3000] [--host 0.0.0.0] [--config vuloom.config.ts] [--mode production]",
   );
 }

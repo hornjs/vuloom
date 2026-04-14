@@ -21,15 +21,15 @@ export interface ToSevokServerOptionsOptions {
 }
 
 /**
- * Convert phial server routes to sevok RoutingOptions.
+ * Convert vuloom server routes to sevok RoutingOptions.
  *
- * This allows phial routes to be used directly with sevok's Server,
+ * This allows vuloom routes to be used directly with sevok's Server,
  * leveraging sevok's built-in routing, middleware resolution, and handler invocation.
  *
  * @example
  * ```ts
  * import { Server } from "sevok";
- * import { toSevokServerOptions } from "phial/server-routes";
+ * import { toSevokServerOptions } from "vuloom/server-routes";
  *
  * const server = new Server({
  *   ...toSevokServerOptions({ routes, middlewareRegistry }),
@@ -42,7 +42,7 @@ export function toSevokServerOptions(
 ): Omit<RoutingOptions, "error"> {
   const { routes, middlewareRegistry, globalMiddlewareNames, fallback } = options;
 
-  // Convert phial routes to sevok ServerRoutes
+  // Convert vuloom routes to sevok ServerRoutes
   const serverRoutes = convertRoutesToSevok(routes);
 
   // Extract all middleware functions from registry

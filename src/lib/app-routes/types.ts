@@ -16,7 +16,7 @@ import type {
 } from "vuepagelet/integration";
 
 /**
- * App route entry kinds supported by phial's file-system routing.
+ * App route entry kinds supported by vuloom's file-system routing.
  * These map to vuepagelet's route module structure.
  */
 export type AppRouteEntryKind =

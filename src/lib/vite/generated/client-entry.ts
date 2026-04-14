@@ -8,7 +8,7 @@ export function createClientEntryModule(options: ClientEntryModuleOptions = {}):
   const idPrefix = options.idPrefix ?? DEFAULT_ID_PREFIX;
 
   return [
-    `import integration from "${idPrefix}phial/generated-app-runtime"`,
+    `import integration from "${idPrefix}vuloom/generated-app-runtime"`,
     "",
     "integration.hydrate().mount()",
     "",
@@ -20,15 +20,15 @@ export function createClientEntryModule(options: ClientEntryModuleOptions = {}):
     "  }",
     "",
     "  hotReloadScheduled = true",
-    "  console.info(`[phial] ${reason}. Reloading the page to apply route changes.`)",
+    "  console.info(`[vuloom] ${reason}. Reloading the page to apply route changes.`)",
     "  window.location.reload()",
     "}",
     "",
     "if (import.meta.hot) {",
     "  import.meta.hot.accept([",
-    `    "${idPrefix}phial/generated-app-runtime",`,
-    `    "${idPrefix}phial/generated-app-plugin",`,
-    `    "${idPrefix}phial/generated-server-plugin"`,
+    `    "${idPrefix}vuloom/generated-app-runtime",`,
+    `    "${idPrefix}vuloom/generated-app-plugin",`,
+    `    "${idPrefix}vuloom/generated-server-plugin"`,
     "  ], () => {",
     '    reloadPage("App runtime or server plugin update detected")',
     "  })",

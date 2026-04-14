@@ -20,37 +20,37 @@ import {
   type PluginOption,
   type ViteDevServer,
 } from "vite";
-import { loadPhialConfig, type PhialConfig, type LoadPhialConfigOptions } from "../config/index.ts";
-import { DEFAULT_CLIENT_ENTRY_PUBLIC_PATH, phial } from "../vite";
+import { loadVuloomConfig, type VuloomConfig, type LoadVuloomConfigOptions } from "../config/index.ts";
+import { DEFAULT_CLIENT_ENTRY_PUBLIC_PATH, vuloom } from "../vite";
 
-export interface PhialDevServerOptions extends LoadPhialConfigOptions {
+export interface VuloomDevServerOptions extends LoadVuloomConfigOptions {
   host?: string;
   port?: number;
   root?: string;
 }
 
-export interface PhialDevServerHandle {
+export interface VuloomDevServerHandle {
   vite: ViteDevServer;
   server: Server;
   url: string;
   close(): Promise<void>;
 }
 
-interface PhialSourceEntryPoints {
+interface VuloomSourceEntryPoints {
   root?: string;
   plugin?: string;
 }
 
-const PHIAL_PACKAGE_ID = "phial";
-const PHIAL_RUNTIME_PACKAGE_ID = "phial";
-const INTERNAL_OPTIMIZE_DEPS_EXCLUDE = [PHIAL_PACKAGE_ID] as const;
-const PHIAL_PACKAGE_ROOT = resolvePhialPackageRoot();
-const PHIAL_SOURCE_ENTRY_POINTS = createPhialSourceEntryPoints();
+const VULOOM_PACKAGE_ID = "vuloom";
+const VULOOM_RUNTIME_PACKAGE_ID = "vuloom";
+const INTERNAL_OPTIMIZE_DEPS_EXCLUDE = [VULOOM_PACKAGE_ID] as const;
+const VULOOM_PACKAGE_ROOT = resolveVuloomPackageRoot();
+const VULOOM_SOURCE_ENTRY_POINTS = createVuloomSourceEntryPoints();
 
-export async function startPhialDevServer(
-  options: PhialDevServerOptions = {},
-): Promise<PhialDevServerHandle> {
-  const loadedConfig = await loadPhialConfig({
+export async function startVuloomDevServer(
+  options: VuloomDevServerOptions = {},
+): Promise<VuloomDevServerHandle> {
+  const loadedConfig = await loadVuloomConfig({
     root: options.root,
     configFile: options.configFile,
     command: "serve",
@@ -63,7 +63,7 @@ export async function startPhialDevServer(
   const port = options.port ?? config.dev?.port ?? 3000;
   const server = createNodeServer();
   const vite = await createViteServer(
-    createPhialViteInlineConfig(config, root, PHIAL_SOURCE_ENTRY_POINTS, server),
+    createVuloomViteInlineConfig(config, root, VULOOM_SOURCE_ENTRY_POINTS, server),
   );
 
   server.on("request", (req, res) => {
@@ -96,10 +96,10 @@ export async function startPhialDevServer(
   };
 }
 
-export function createPhialViteInlineConfig(
-  config: PhialConfig,
+export function createVuloomViteInlineConfig(
+  config: VuloomConfig,
   root: string,
-  sourceEntryPoints?: PhialSourceEntryPoints,
+  sourceEntryPoints?: VuloomSourceEntryPoints,
   hmrServer?: Server,
 ): InlineConfig {
   const vueFeatureFlags = {
@@ -107,11 +107,11 @@ export function createPhialViteInlineConfig(
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
   };
-  const routesPlugin = phial({
+  const routesPlugin = vuloom({
     ...config.plugin,
     root: config.plugin?.root ?? root,
   });
-  const sourceRuntimePlugin = createPhialSourceRuntimePlugin(sourceEntryPoints);
+  const sourceRuntimePlugin = createVuloomSourceRuntimePlugin(sourceEntryPoints);
   const userViteConfig = config.vite ?? {};
   const userOptimizeDeps = userViteConfig.optimizeDeps ?? {};
   const userPlugins = normalizePlugins(userViteConfig.plugins);
@@ -217,10 +217,10 @@ export async function createDevRequestHandler(
   } = {},
 ) {
   const appPluginModule = (await vite.ssrLoadModule(
-    `${PHIAL_RUNTIME_PACKAGE_ID}/generated-app-plugin`,
+    `${VULOOM_RUNTIME_PACKAGE_ID}/generated-app-plugin`,
   )) as DevAppPluginModule | undefined;
   const serverPluginModule = (await vite.ssrLoadModule(
-    `${PHIAL_RUNTIME_PACKAGE_ID}/generated-server-plugin`,
+    `${VULOOM_RUNTIME_PACKAGE_ID}/generated-server-plugin`,
   )) as DevServerPluginModule | undefined;
 
   const middleware = [
@@ -335,31 +335,31 @@ function isEncryptedRequest(req: IncomingMessage): boolean {
   return "encrypted" in req.socket && Boolean((req.socket as { encrypted?: boolean }).encrypted);
 }
 
-function createPhialSourceEntryPoints(): PhialSourceEntryPoints {
+function createVuloomSourceEntryPoints(): VuloomSourceEntryPoints {
   const entries = {
-    root: resolve(PHIAL_PACKAGE_ROOT, "src/index.ts"),
-    plugin: resolve(PHIAL_PACKAGE_ROOT, "src/vite.ts"),
+    root: resolve(VULOOM_PACKAGE_ROOT, "src/index.ts"),
+    plugin: resolve(VULOOM_PACKAGE_ROOT, "src/vite.ts"),
   };
 
   return Object.fromEntries(Object.entries(entries).filter(([, file]) => existsSync(file)));
 }
 
-function createPhialSourceRuntimePlugin(
-  sourceEntryPoints?: PhialSourceEntryPoints,
+function createVuloomSourceRuntimePlugin(
+  sourceEntryPoints?: VuloomSourceEntryPoints,
 ): Plugin | undefined {
   if (!sourceEntryPoints?.root) {
     return undefined;
   }
 
   return {
-    name: "phial:source-runtime",
+    name: "vuloom:source-runtime",
     enforce: "pre",
     resolveId(id, _importer, _options) {
-      if (id === PHIAL_PACKAGE_ID) {
+      if (id === VULOOM_PACKAGE_ID) {
         return sourceEntryPoints?.root ?? null;
       }
 
-      if (id === `${PHIAL_PACKAGE_ID}/vite` || id === `${PHIAL_PACKAGE_ID}/vite-plugin`) {
+      if (id === `${VULOOM_PACKAGE_ID}/vite` || id === `${VULOOM_PACKAGE_ID}/vite-plugin`) {
         return sourceEntryPoints?.plugin ?? null;
       }
 
@@ -368,7 +368,7 @@ function createPhialSourceRuntimePlugin(
   };
 }
 
-function resolvePhialPackageRoot(): string {
+function resolveVuloomPackageRoot(): string {
   const currentDir = dirname(fileURLToPath(import.meta.url));
   const packageRoot = resolve(currentDir, "../../../..");
 
@@ -383,10 +383,10 @@ function resolvePhialPackageRoot(): string {
   return resolve(currentDir, "../../../..");
 }
 
-function hasPhialPlugin(plugins: PluginOption[]): boolean {
+function hasVuloomPlugin(plugins: PluginOption[]): boolean {
   return plugins.some(
     (plugin) =>
-      plugin && typeof plugin === "object" && "name" in plugin && plugin.name === "phial:routes",
+      plugin && typeof plugin === "object" && "name" in plugin && plugin.name === "vuloom:routes",
   );
 }
 
@@ -421,7 +421,7 @@ function createDevServerPlugins(options: {
     ...(options.sourceRuntimePlugin ? [options.sourceRuntimePlugin] : []),
     ...(hasVuePlugin(options.userPlugins) ? [] : [vue() as PluginOption]),
     ...(hasVueJsxPlugin(options.userPlugins) ? [] : [vueJsx() as PluginOption]),
-    ...(hasPhialPlugin(options.userPlugins) ? [] : [options.routesPlugin]),
+    ...(hasVuloomPlugin(options.userPlugins) ? [] : [options.routesPlugin]),
     ...options.userPlugins,
   ];
 }

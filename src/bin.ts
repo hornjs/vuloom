@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
 import process from "node:process";
-import { runPhialCli } from "./lib/cli.js";
+import { runVuloomCli } from "./lib/cli.js";
 
-process.exitCode = await runPhialCli(process.argv.slice(2));
+process.exitCode = await runVuloomCli(process.argv.slice(2));

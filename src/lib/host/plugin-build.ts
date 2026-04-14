@@ -9,37 +9,37 @@ import {
   type Plugin,
   type PluginOption,
 } from "vite";
-import { loadPhialConfig, type PhialConfig, type LoadPhialConfigOptions } from "../config";
+import { loadVuloomConfig, type VuloomConfig, type LoadVuloomConfigOptions } from "../config";
 import { createClientEntryModule } from "../vite/generated/client-entry";
-import { phial } from "../vite";
+import { vuloom } from "../vite";
 
-const PHIAL_BUILD_CLIENT_ENTRY_ID = "virtual:phial-client-entry";
-const RESOLVED_PHIAL_BUILD_CLIENT_ENTRY_ID = "\0virtual:phial-client-entry";
-const PHIAL_BUILD_SERVER_ENTRY_ID = "virtual:phial-server-entry";
-const RESOLVED_PHIAL_BUILD_SERVER_ENTRY_ID = "\0virtual:phial-server-entry";
+const VULOOM_BUILD_CLIENT_ENTRY_ID = "virtual:vuloom-client-entry";
+const RESOLVED_VULOOM_BUILD_CLIENT_ENTRY_ID = "\0virtual:vuloom-client-entry";
+const VULOOM_BUILD_SERVER_ENTRY_ID = "virtual:vuloom-server-entry";
+const RESOLVED_VULOOM_BUILD_SERVER_ENTRY_ID = "\0virtual:vuloom-server-entry";
 
 export const DEFAULT_CLIENT_BUILD_OUT_DIR = ".output/public";
 export const DEFAULT_SERVER_BUILD_OUT_DIR = ".output/server";
 
-export interface PhialBuildOptions extends LoadPhialConfigOptions {
+export interface VuloomBuildOptions extends LoadVuloomConfigOptions {
   watch?: boolean;
 }
 
-export interface PhialBuildResult {
+export interface VuloomBuildResult {
   client: Awaited<ReturnType<typeof viteBuild>>;
   server: Awaited<ReturnType<typeof viteBuild>>;
 }
 
-export function createPhialBuildServerEntryModule(): string {
+export function createVuloomBuildServerEntryModule(): string {
   return [
     'import { Server } from "sevok"',
     'import { NodeRuntimeAdapter } from "sevok/node"',
     'import { serveStatic } from "sevok/static"',
-    'import createAppPlugin from "phial/generated-app-plugin"',
-    'import createServerPlugin from "phial/generated-server-plugin"',
+    'import createAppPlugin from "vuloom/generated-app-plugin"',
+    'import createServerPlugin from "vuloom/generated-server-plugin"',
     "",
-    'export const generatedAppPluginId = "phial/generated-app-plugin"',
-    'export const generatedServerPluginId = "phial/generated-server-plugin"',
+    'export const generatedAppPluginId = "vuloom/generated-app-plugin"',
+    'export const generatedServerPluginId = "vuloom/generated-server-plugin"',
     "",
     "export function createServerApp(options = {}) {",
     "  const {",
@@ -73,8 +73,8 @@ export function createPhialBuildServerEntryModule(): string {
   ].join("\n");
 }
 
-export async function buildPhialApp(options: PhialBuildOptions = {}): Promise<PhialBuildResult> {
-  const loadedConfig = await loadPhialConfig({
+export async function buildVuloomApp(options: VuloomBuildOptions = {}): Promise<VuloomBuildResult> {
+  const loadedConfig = await loadVuloomConfig({
     root: options.root,
     configFile: options.configFile,
     command: "build",
@@ -84,9 +84,9 @@ export async function buildPhialApp(options: PhialBuildOptions = {}): Promise<Ph
     logLevel: options.logLevel,
   });
   const root = loadedConfig.configRoot;
-  const client = await viteBuild(createPhialClientBuildConfig(loadedConfig.config, root, options));
+  const client = await viteBuild(createVuloomClientBuildConfig(loadedConfig.config, root, options));
   const server = await viteBuild(
-    await createPhialServerBuildConfig(loadedConfig.config, root, options),
+    await createVuloomServerBuildConfig(loadedConfig.config, root, options),
   );
 
   return {
@@ -95,21 +95,21 @@ export async function buildPhialApp(options: PhialBuildOptions = {}): Promise<Ph
   };
 }
 
-function createPhialClientBuildConfig(
-  config: PhialConfig,
+function createVuloomClientBuildConfig(
+  config: VuloomConfig,
   root: string,
-  options: Pick<PhialBuildOptions, "watch" | "logLevel">,
+  options: Pick<VuloomBuildOptions, "watch" | "logLevel">,
 ): InlineConfig {
   const vueFeatureFlags = {
     __VUE_OPTIONS_API__: true,
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
   };
-  const routesPlugin = phial({
+  const routesPlugin = vuloom({
     ...config.plugin,
     root: config.plugin?.root ?? root,
   });
-  const clientEntryPlugin = createPhialBuildClientEntryPlugin();
+  const clientEntryPlugin = createVuloomBuildClientEntryPlugin();
   const userViteConfig = config.vite ?? {};
   const userPlugins = normalizePlugins(userViteConfig.plugins);
   const defaultBuildConfig = createDefaultClientBuildConfig(userViteConfig, options.watch);
@@ -140,16 +140,16 @@ function createPhialClientBuildConfig(
   return mergeConfig(baseConfig, userViteConfig);
 }
 
-async function createPhialServerBuildConfig(
-  config: PhialConfig,
+async function createVuloomServerBuildConfig(
+  config: VuloomConfig,
   root: string,
-  options: Pick<PhialBuildOptions, "watch" | "logLevel">,
+  options: Pick<VuloomBuildOptions, "watch" | "logLevel">,
 ): Promise<InlineConfig> {
-  const routesPlugin = phial({
+  const routesPlugin = vuloom({
     ...config.plugin,
     root: config.plugin?.root ?? root,
   });
-  const serverEntryPlugin = createPhialBuildServerEntryPlugin();
+  const serverEntryPlugin = createVuloomBuildServerEntryPlugin();
   const userViteConfig = config.vite ?? {};
   const userPlugins = normalizePlugins(userViteConfig.plugins);
   const serverOutDir = resolve(root, DEFAULT_SERVER_BUILD_OUT_DIR);
@@ -178,7 +178,7 @@ async function createPhialServerBuildConfig(
       manifest: false,
       ssrManifest: false,
       rollupOptions: {
-        input: PHIAL_BUILD_SERVER_ENTRY_ID,
+        input: VULOOM_BUILD_SERVER_ENTRY_ID,
         output: {
           format: "es",
           entryFileNames: "index.js",
@@ -201,7 +201,7 @@ async function createPhialServerBuildConfig(
       ssrManifest: false,
       rollupOptions: mergeConfig(
         {
-          input: PHIAL_BUILD_SERVER_ENTRY_ID,
+          input: VULOOM_BUILD_SERVER_ENTRY_ID,
           output: {
             format: "es",
             entryFileNames: "index.js",
@@ -229,7 +229,7 @@ function createDefaultClientBuildConfig(
           rollupOptions: mergeConfig(
             {
               input: {
-                "client-entry": PHIAL_BUILD_CLIENT_ENTRY_ID,
+                "client-entry": VULOOM_BUILD_CLIENT_ENTRY_ID,
               },
             },
             userBuild.rollupOptions ?? {},
@@ -239,19 +239,19 @@ function createDefaultClientBuildConfig(
   };
 }
 
-function createPhialBuildClientEntryPlugin(): Plugin {
+function createVuloomBuildClientEntryPlugin(): Plugin {
   return {
-    name: "phial:build-client-entry",
+    name: "vuloom:build-client-entry",
     enforce: "pre",
     resolveId(id) {
-      if (id === PHIAL_BUILD_CLIENT_ENTRY_ID) {
-        return RESOLVED_PHIAL_BUILD_CLIENT_ENTRY_ID;
+      if (id === VULOOM_BUILD_CLIENT_ENTRY_ID) {
+        return RESOLVED_VULOOM_BUILD_CLIENT_ENTRY_ID;
       }
 
       return null;
     },
     load(id) {
-      if (id === RESOLVED_PHIAL_BUILD_CLIENT_ENTRY_ID) {
+      if (id === RESOLVED_VULOOM_BUILD_CLIENT_ENTRY_ID) {
         return createClientEntryModule({
           idPrefix: "",
         });
@@ -262,20 +262,20 @@ function createPhialBuildClientEntryPlugin(): Plugin {
   };
 }
 
-function createPhialBuildServerEntryPlugin(): Plugin {
+function createVuloomBuildServerEntryPlugin(): Plugin {
   return {
-    name: "phial:build-server-entry",
+    name: "vuloom:build-server-entry",
     enforce: "pre",
     resolveId(id) {
-      if (id === PHIAL_BUILD_SERVER_ENTRY_ID) {
-        return RESOLVED_PHIAL_BUILD_SERVER_ENTRY_ID;
+      if (id === VULOOM_BUILD_SERVER_ENTRY_ID) {
+        return RESOLVED_VULOOM_BUILD_SERVER_ENTRY_ID;
       }
 
       return null;
     },
     load(id) {
-      if (id === RESOLVED_PHIAL_BUILD_SERVER_ENTRY_ID) {
-        return createPhialBuildServerEntryModule();
+      if (id === RESOLVED_VULOOM_BUILD_SERVER_ENTRY_ID) {
+        return createVuloomBuildServerEntryModule();
       }
 
       return null;
@@ -292,15 +292,15 @@ function createBuildPlugins(options: {
     options.entryPlugin,
     ...(hasVuePlugin(options.userPlugins) ? [] : [vue() as PluginOption]),
     ...(hasVueJsxPlugin(options.userPlugins) ? [] : [vueJsx() as PluginOption]),
-    ...(hasPhialPlugin(options.userPlugins) ? [] : [options.routesPlugin]),
+    ...(hasVuloomPlugin(options.userPlugins) ? [] : [options.routesPlugin]),
     ...options.userPlugins,
   ];
 }
 
-function hasPhialPlugin(plugins: PluginOption[]): boolean {
+function hasVuloomPlugin(plugins: PluginOption[]): boolean {
   return plugins.some(
     (plugin) =>
-      plugin && typeof plugin === "object" && "name" in plugin && plugin.name === "phial:routes",
+      plugin && typeof plugin === "object" && "name" in plugin && plugin.name === "vuloom:routes",
   );
 }
 

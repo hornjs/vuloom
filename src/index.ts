@@ -1,41 +1,41 @@
-// Phial 主入口（用于命令行和配置文件）
+// Vuloom 主入口（用于命令行和配置文件）
 export { name, version } from "../package.json" with { type: "json" };
 
-export { runPhialCli } from "./lib/cli";
+export { runVuloomCli } from "./lib/cli";
 
 // 配置定义
 export {
   defineConfig,
-  loadPhialConfig,
+  loadVuloomConfig,
 } from "./lib/config";
 
 // CLI 命令
 export {
-  buildPhialApp,
-  preparePhialApp,
-  startPhialDevServer,
-  startPhialServer,
+  buildVuloomApp,
+  prepareVuloomApp,
+  startVuloomDevServer,
+  startVuloomServer,
 } from "./lib/host";
 
 // 配置类型
 export type {
-  PhialConfig,
-  PhialConfigEnv,
-  PhialConfigExport,
-  PhialDevConfig,
-  PhialPluginOptions,
-  PhialServerConfig,
-  LoadPhialConfigOptions,
-  LoadedPhialConfig,
+  VuloomConfig,
+  VuloomConfigEnv,
+  VuloomConfigExport,
+  VuloomDevConfig,
+  VuloomPluginOptions,
+  VuloomServerConfig,
+  LoadVuloomConfigOptions,
+  LoadedVuloomConfig,
 } from "./lib/config";
 
 // CLI 类型
 export type {
-  PhialBuildOptions,
-  PhialBuildResult,
-  PhialPrepareOptions,
-  PhialDevServerHandle,
-  PhialDevServerOptions,
-  PhialStartServerHandle,
-  PhialStartServerOptions,
+  VuloomBuildOptions,
+  VuloomBuildResult,
+  VuloomPrepareOptions,
+  VuloomDevServerHandle,
+  VuloomDevServerOptions,
+  VuloomStartServerHandle,
+  VuloomStartServerOptions,
 } from "./lib/host";
