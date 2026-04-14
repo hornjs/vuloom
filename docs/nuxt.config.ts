@@ -40,7 +40,7 @@ export default defineNuxtConfig({
   content: {
     database: {
       type: "d1",
-      bindingName: "phial_docs_db"
+      bindingName: "vuloom_docs_db"
     }
   }
 })

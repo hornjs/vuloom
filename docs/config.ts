@@ -49,10 +49,10 @@ export interface SiteConfig {
 }
 
 const siteConfig: SiteConfig = {
-  name: "Phial",
+  name: "Vuloom",
   shortDescription: "The Full-Stack Vue Framework",
   description: "Build full-stack Vue applications with typed file routing, server rendering, route loaders and actions, and first-class server handlers.",
-  github: "hornjs/phial",
+  github: "hornjs/vuloom",
   logo: "/icon.svg",
   url: inferSiteURL(),
   socials: {},
@@ -74,7 +74,7 @@ const siteConfig: SiteConfig = {
       playOnline: {
         label: "Play Online",
         icon: "i-heroicons-play",
-        to: "https://stackblitz.com/fork/github/hornjs/phial/tree/main/examples/zero-config?startScript=dev&title=Phial%20StackBlitz%20Example",
+        to: "https://stackblitz.com/fork/github/hornjs/vuloom/tree/main/examples/zero-config?startScript=dev&title=Vuloom%20StackBlitz%20Example",
       }
     },
     // heroCode: {
