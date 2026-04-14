@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   ssr,
   css: [resolve("./app/assets/main.css")],
   devtools: { enabled: isDev },
-  compatibilityDate: '2026-04-09',
+  compatibilityDate: '2026-04-03',
   // @ts-ignore
   site: siteConfig,
   app: {
