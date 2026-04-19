@@ -114,7 +114,7 @@ export function createVirtualAppRuntimeModule(result: ScannedRoutesResult): stri
   ];
 
   return [
-    'import { createRouteRuntimeIntegration } from "vuepagelet/integration"',
+    'import { createRouteRuntimeIntegration } from "vuloom/integration"',
     `import { manifest } from ${JSON.stringify(GENERATED_ROUTES_MANIFEST_ID)}`,
     `import { routeModules } from ${JSON.stringify(GENERATED_ROUTES_MODULES_ID)}`,
     `import { appMiddlewareRegistry } from ${JSON.stringify(GENERATED_APP_MIDDLEWARE_ID)}`,
