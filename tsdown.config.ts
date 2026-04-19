@@ -7,6 +7,7 @@ export default defineConfig({
     "src/app.ts",
     "src/bin.ts",
     "src/index.ts",
+    "src/integration.ts",
     "src/server.ts",
     "src/vite.ts",
   ],

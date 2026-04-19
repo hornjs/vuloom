@@ -89,7 +89,7 @@ describe("virtual module generators", () => {
     const clientEntry = createClientEntryModule({ idPrefix: "" });
 
     expect(manifestModule).toContain("export const manifest = [");
-    expect(runtimeModule).toContain("vuepagelet/integration");
+    expect(runtimeModule).toContain("vuloom/integration");
     expect(runtimeModule).toContain("vuloom/generated-app-middleware");
     expect(runtimeModule).toContain("resolveMiddlewareReferences");
     expect(runtimeModule).toContain("resolvedModule.directoryMiddleware");

@@ -62,9 +62,9 @@
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
-    "fs-route-ir": "latest",
-    "sevok": "latest",
-    "vuepagelet": "latest"
+    "fs-route-ir": "^0.0.2",
+    "sevok": "^0.0.6",
+    "vuepagelet": "^0.0.2"
   },
   "devDependencies": {
     "@types/node": "^25.5.2",
