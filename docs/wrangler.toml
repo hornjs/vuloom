@@ -1,8 +1,0 @@
-name = "vuloom"
-compatibility_date = "2026-04-03"
-pages_build_output_dir = "dist"
-
-[[d1_databases]]
-binding = "vuloom_docs_db"
-database_name = "vuloom-docs-db"
-database_id = "76cd6988-1a13-4934-9267-4597fb54c364"

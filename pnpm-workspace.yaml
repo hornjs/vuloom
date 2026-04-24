@@ -1,2 +1,10 @@
+packages:
+  - docs
+  - .
+
+ignoredBuiltDependencies:
+  - vue-demi
+
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - esbuild
